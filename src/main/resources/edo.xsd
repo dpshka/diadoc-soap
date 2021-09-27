@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns="http://www.grinn-corp.ru/gestori/edo" targetNamespace="http://www.grinn-corp.ru/gestori/edo"
+  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  xmlns:tns="http://www.grinn-corp.ru/gestori/edo"
+  elementFormDefault="qualified">
+
+  <xs:element name="SendOutgoingUniversalTransferDocumentRequest">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="document" type="tns:OutgoingUniversalTransferDocument"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="SendOutgoingUniversalTransferDocumentResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="result" type="xs:string"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:complexType name="OutgoingUniversalTransferDocument">
+    <xs:sequence>
+      <xs:element name="DocNumber" type="xs:string"/>
+      <xs:element name="DocDate" type="xs:date"/>
+    </xs:sequence>
+  </xs:complexType>
+
+</xs:schema>
+
+
