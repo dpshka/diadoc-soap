@@ -12,8 +12,11 @@ public class UniversalTransferDocument {
 
     private Date documentDate;
     private String documentNumber;
+    private Firm seller;
+    private Firm buyer;
+    private BigDecimal vatAmount;
+    private BigDecimal total;
 
-    private String buyerINN = "";
     private List<UniversalTransferDocumentItem> items;
 
     public UniversalTransferDocument() {

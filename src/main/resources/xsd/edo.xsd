@@ -1,31 +1,78 @@
 <?xml version="1.0" encoding="utf-8"?>
 <xs:schema xmlns="http://www.grinn-corp.ru/gestori/edo" targetNamespace="http://www.grinn-corp.ru/gestori/edo"
   xmlns:xs="http://www.w3.org/2001/XMLSchema"
-  xmlns:tns="http://www.grinn-corp.ru/gestori/edo"
+  xmlns:edo="http://www.grinn-corp.ru/gestori/edo"
   elementFormDefault="qualified">
 
   <xs:element name="SendOutgoingUniversalTransferDocumentRequest">
     <xs:complexType>
       <xs:sequence>
-        <xs:element name="document" type="tns:OutgoingUniversalTransferDocument"/>
-      </xs:sequence>
-    </xs:complexType>
-  </xs:element>
-
-  <xs:element name="SendOutgoingUniversalTransferDocumentResponse">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element name="result" type="xs:string"/>
+        <xs:element name="Document" type="edo:OutgoingUniversalTransferDocument"/>
       </xs:sequence>
     </xs:complexType>
   </xs:element>
 
   <xs:complexType name="OutgoingUniversalTransferDocument">
     <xs:sequence>
-      <xs:element name="DocNumber" type="xs:string"/>
-      <xs:element name="DocDate" type="xs:date"/>
+      <xs:element name="DocumentNumber" type="xs:string"/>
+      <xs:element name="DocumentDate" type="xs:date"/>
+      <xs:element name="Seller" type="edo:OutgoingUniversalTransferDocumentFirm"/>
+      <xs:element name="Buyer" type="edo:OutgoingUniversalTransferDocumentFirm"/>
+      <xs:element name="VatAmount" type="xs:decimal"/>
+      <xs:element name="TotalAmount" type="xs:decimal"/>
+      <xs:element minOccurs="0" name="Items">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element minOccurs="1" maxOccurs="unbounded" name="Item" type="edo:OutgoingUniversalTransferDocumentItem"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
     </xs:sequence>
   </xs:complexType>
+
+  <xs:complexType name="OutgoingUniversalTransferDocumentFirm">
+    <xs:sequence>
+      <xs:element name="INN" type="xs:string"/>
+      <xs:element name="KPP" type="xs:string"/>
+      <xs:element name="Name" type="xs:string"/>
+      <xs:element name="Address" type="edo:OutgoingUniversalTransferDocumentFirmAddress"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="OutgoingUniversalTransferDocumentFirmAddress">
+    <xs:sequence>
+      <xs:element name="ZipCode" type="xs:string"/>
+      <xs:element name="Region" type="xs:string"/>
+      <xs:element name="Territory" type="xs:string"/>
+      <xs:element name="City" type="xs:string"/>
+      <xs:element name="Locality" type="xs:string"/>
+      <xs:element name="Street" type="xs:string"/>
+      <xs:element name="Building" type="xs:string"/>
+      <xs:element name="Block" type="xs:string"/>
+      <xs:element name="Apartment" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="OutgoingUniversalTransferDocumentItem">
+    <xs:sequence>
+      <xs:element name="Name" type="xs:string"/>
+      <xs:element name="MeasureUnit" type="xs:string"/>
+      <xs:element name="Quantity" type="xs:decimal"/>
+      <xs:element name="Price" type="xs:decimal"/>
+      <xs:element name="SubTotalWithoutVatAmount" type="xs:decimal"/>
+      <xs:element name="VatRate" type="xs:integer"/>
+      <xs:element name="VatAmount" type="xs:decimal"/>
+      <xs:element name="SubTotalAmount" type="xs:decimal"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:element name="SendOutgoingUniversalTransferDocumentResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="Result" type="xs:string"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
 
 </xs:schema>
 

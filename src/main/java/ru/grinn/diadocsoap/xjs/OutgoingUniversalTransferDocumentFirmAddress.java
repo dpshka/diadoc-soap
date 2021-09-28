@@ -10,35 +10,30 @@ package ru.grinn.diadocsoap.xjs;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * <p>Java class for RussianAddress complex type.
+ * <p>Java class for OutgoingUniversalTransferDocumentFirmAddress complex type.
  * 
  * <p>The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
- * &lt;complexType name="RussianAddress"&gt;
+ * &lt;complexType name="OutgoingUniversalTransferDocumentFirmAddress"&gt;
  *   &lt;complexContent&gt;
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
- *       &lt;attribute name="ZipCode"&gt;
- *         &lt;simpleType&gt;
- *           &lt;restriction base="{http://www.w3.org/2001/XMLSchema}string"&gt;
- *             &lt;length value="6"/&gt;
- *             &lt;pattern value="[0-9]{6}"/&gt;
- *           &lt;/restriction&gt;
- *         &lt;/simpleType&gt;
- *       &lt;/attribute&gt;
- *       &lt;attribute name="Region" use="required" type="{}string50" /&gt;
- *       &lt;attribute name="Territory" type="{}string50" /&gt;
- *       &lt;attribute name="City" type="{}string50" /&gt;
- *       &lt;attribute name="Locality" type="{}string50" /&gt;
- *       &lt;attribute name="Street" type="{}string50" /&gt;
- *       &lt;attribute name="Building" type="{}string20" /&gt;
- *       &lt;attribute name="Block" type="{}string20" /&gt;
- *       &lt;attribute name="Apartment" type="{}string20" /&gt;
+ *       &lt;sequence&gt;
+ *         &lt;element name="ZipCode" type="{http://www.w3.org/2001/XMLSchema}string"/&gt;
+ *         &lt;element name="Region" type="{http://www.w3.org/2001/XMLSchema}string"/&gt;
+ *         &lt;element name="Territory" type="{http://www.w3.org/2001/XMLSchema}string"/&gt;
+ *         &lt;element name="City" type="{http://www.w3.org/2001/XMLSchema}string"/&gt;
+ *         &lt;element name="Locality" type="{http://www.w3.org/2001/XMLSchema}string"/&gt;
+ *         &lt;element name="Street" type="{http://www.w3.org/2001/XMLSchema}string"/&gt;
+ *         &lt;element name="Building" type="{http://www.w3.org/2001/XMLSchema}string"/&gt;
+ *         &lt;element name="Block" type="{http://www.w3.org/2001/XMLSchema}string"/&gt;
+ *         &lt;element name="Apartment" type="{http://www.w3.org/2001/XMLSchema}string"/&gt;
+ *       &lt;/sequence&gt;
  *     &lt;/restriction&gt;
  *   &lt;/complexContent&gt;
  * &lt;/complexType&gt;
@@ -47,26 +42,36 @@ import javax.xml.bind.annotation.XmlType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "RussianAddress")
-public class RussianAddress {
+@XmlType(name = "OutgoingUniversalTransferDocumentFirmAddress", namespace = "http://www.grinn-corp.ru/gestori/edo", propOrder = {
+    "zipCode",
+    "region",
+    "territory",
+    "city",
+    "locality",
+    "street",
+    "building",
+    "block",
+    "apartment"
+})
+public class OutgoingUniversalTransferDocumentFirmAddress {
 
-    @XmlAttribute(name = "ZipCode")
+    @XmlElement(name = "ZipCode", namespace = "http://www.grinn-corp.ru/gestori/edo", required = true)
     protected String zipCode;
-    @XmlAttribute(name = "Region", required = true)
+    @XmlElement(name = "Region", namespace = "http://www.grinn-corp.ru/gestori/edo", required = true)
     protected String region;
-    @XmlAttribute(name = "Territory")
+    @XmlElement(name = "Territory", namespace = "http://www.grinn-corp.ru/gestori/edo", required = true)
     protected String territory;
-    @XmlAttribute(name = "City")
+    @XmlElement(name = "City", namespace = "http://www.grinn-corp.ru/gestori/edo", required = true)
     protected String city;
-    @XmlAttribute(name = "Locality")
+    @XmlElement(name = "Locality", namespace = "http://www.grinn-corp.ru/gestori/edo", required = true)
     protected String locality;
-    @XmlAttribute(name = "Street")
+    @XmlElement(name = "Street", namespace = "http://www.grinn-corp.ru/gestori/edo", required = true)
     protected String street;
-    @XmlAttribute(name = "Building")
+    @XmlElement(name = "Building", namespace = "http://www.grinn-corp.ru/gestori/edo", required = true)
     protected String building;
-    @XmlAttribute(name = "Block")
+    @XmlElement(name = "Block", namespace = "http://www.grinn-corp.ru/gestori/edo", required = true)
     protected String block;
-    @XmlAttribute(name = "Apartment")
+    @XmlElement(name = "Apartment", namespace = "http://www.grinn-corp.ru/gestori/edo", required = true)
     protected String apartment;
 
     /**
