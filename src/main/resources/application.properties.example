@@ -1,0 +1,7 @@
+diadoc-soap.apiClientId=<<apiClientId>>
+diadoc-soap.apiUrl=https://diadoc-api.kontur.ru
+diadoc-soap.certificateAlias=<<alias>>
+diadoc-soap.keyPassword=<<password>>
+diadoc-soap.utdTypeNameId=UniversalTransferDocument
+diadoc-soap.utdFunction=СЧФДОП
+diadoc-soap.utdVersion=utd820_05_01_02_hyphen

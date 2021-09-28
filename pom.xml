@@ -82,6 +82,22 @@
             <scope>provided</scope>
         </dependency>
 
+        <dependency>
+            <groupId>ru.CryptoPro</groupId>
+            <artifactId>JCP</artifactId>
+            <version>2.0.41940-A</version>
+        </dependency>
+        <dependency>
+            <groupId>com.objsys.asn1j</groupId>
+            <artifactId>asn1rt</artifactId>
+            <version>2.0.41940-A</version>
+        </dependency>
+        <dependency>
+            <groupId>ru.CryptoPro</groupId>
+            <artifactId>ASN1P</artifactId>
+            <version>2.0.41940-A</version>
+        </dependency>
+
     </dependencies>
 
     <build>
@@ -103,7 +119,7 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <sources>${project.basedir}/src/main/resources/</sources>
+                    <sources>${project.basedir}/src/main/resources/xsd/</sources>
                     <outputDirectory>${project.basedir}/src/main/java</outputDirectory>
                     <clearOutputDir>false</clearOutputDir>
                     <packageName>ru.grinn.diadocsoap.xjs</packageName>

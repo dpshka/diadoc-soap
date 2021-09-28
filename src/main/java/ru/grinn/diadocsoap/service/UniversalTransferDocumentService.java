@@ -1,26 +1,35 @@
 package ru.grinn.diadocsoap.service;
 
+import Diadoc.Api.Proto.Events.DiadocMessage_PostApiProtos;
 import Diadoc.Api.Proto.OrganizationProtos;
+import Diadoc.Api.documentType.XsdContentType;
 import Diadoc.Api.exceptions.DiadocSdkException;
+import com.google.protobuf.ByteString;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import ru.grinn.diadocsoap.configuration.ApplicationConfiguration;
 import ru.grinn.diadocsoap.model.UniversalTransferDocument;
 import ru.grinn.diadocsoap.xjs.*;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 import java.io.ByteArrayOutputStream;
+import java.io.FileOutputStream;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.text.SimpleDateFormat;
 
 @Service
 public class UniversalTransferDocumentService {
-    private DiadocService diadocService;
+    private final DiadocService diadocService;
+    private final CertificateService certificateService;
+    private final ApplicationConfiguration applicationConfiguration;
 
     @Autowired
-    public UniversalTransferDocumentService(DiadocService diadocService) {
+    public UniversalTransferDocumentService(DiadocService diadocService, CertificateService certificateService, ApplicationConfiguration applicationConfiguration) {
         this.diadocService = diadocService;
+        this.certificateService = certificateService;
+        this.applicationConfiguration = applicationConfiguration;
     }
 
     public void buildDocument(UniversalTransferDocument document) {
@@ -36,16 +45,34 @@ public class UniversalTransferDocumentService {
 
             var generatedTitle = diadocService.getApi().getGenerateClient().generateTitleXml(
                     diadocService.getMyBoxId(),
-                    "UniversalTransferDocument",
-                    "СЧФДОП",
-                    "utd820_05_01_01_hyphen",
+                    applicationConfiguration.getUtdTypeNameId(),
+                    applicationConfiguration.getUtdFunction(),
+                    applicationConfiguration.getUtdVersion(),
                     0,
                     s.toByteArray(),
                     "",
                     "");
 
-            System.out.println(generatedTitle.toString());
-            generatedTitle.saveContentToFile("d:/temp/test.xml");
+            byte[] signature = certificateService.sign(generatedTitle.getContent());
+
+            var documentAttachmentBuilder = DiadocMessage_PostApiProtos.DocumentAttachment.newBuilder();
+            documentAttachmentBuilder.setTypeNamedId(applicationConfiguration.getUtdTypeNameId());
+            documentAttachmentBuilder.setFunction(applicationConfiguration.getUtdFunction());
+            documentAttachmentBuilder.setVersion(applicationConfiguration.getUtdVersion());
+
+            var signedContentBuilder = DiadocMessage_PostApiProtos.SignedContent.newBuilder();
+            signedContentBuilder.setContent(ByteString.copyFrom(generatedTitle.getContent()));
+            signedContentBuilder.setSignature(ByteString.copyFrom(signature));
+            documentAttachmentBuilder.setSignedContent(signedContentBuilder);
+
+            var messageToPostBuilder = DiadocMessage_PostApiProtos.MessageToPost.newBuilder();
+            messageToPostBuilder.addDocumentAttachments(documentAttachmentBuilder);
+            messageToPostBuilder.setFromBoxId(diadocService.getMyBoxId());
+            messageToPostBuilder.setToBoxId(diadocService.getTestBoxId());
+
+            var response = diadocService.getApi().getMessageClient().postMessage(messageToPostBuilder.build());
+            System.out.println("returned message's id " + response.getMessageId());
+            System.out.println("returned message's type " + response.getMessageType().name());
         }
         catch (Exception e) {
             e.printStackTrace();
@@ -58,7 +85,7 @@ public class UniversalTransferDocumentService {
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
         xmlDocument.setDocumentDate(dateFormat.format(document.getDocumentDate()));
         xmlDocument.setCurrency("643");
-        xmlDocument.setFunction("СЧФДОП");
+        xmlDocument.setFunction(applicationConfiguration.getUtdFunction());
         xmlDocument.setDocumentCreator(diadocService.getMyOrganization().getFullName());
 
         var xmlSellers = new UniversalTransferDocumentWithHyphens.Sellers();
@@ -149,6 +176,14 @@ public class UniversalTransferDocumentService {
         xmlOrganisationInfo.setOrganizationDetails(xmlOrganisationDetails);
         return xmlOrganisationInfo;
     }
+
+    private void saveUserContractXsd(String filename) throws Exception {
+        var content = diadocService.getApi().getDocumentTypeClient().getContent(applicationConfiguration.getUtdTypeNameId(), applicationConfiguration.getUtdFunction(), applicationConfiguration.getUtdVersion(), 0,  XsdContentType.UserContractXsd);
+        var output = new FileOutputStream(filename);
+        output.write(content.getBytes());
+        output.close();
+    }
+
 
 
 }
