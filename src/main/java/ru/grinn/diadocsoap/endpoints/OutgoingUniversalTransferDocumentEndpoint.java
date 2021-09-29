@@ -29,10 +29,14 @@ public class OutgoingUniversalTransferDocumentEndpoint {
         UniversalTransferDocument document = new UniversalTransferDocument();
         document.setDocumentNumber(requestDocument.getDocumentNumber());
         document.setDocumentDate(requestDocument.getDocumentDate().toGregorianCalendar().getTime());
+        document.setShipmentDocumentNumber(requestDocument.getShipmentDocumentNumber());
+        document.setShipmentDocumentDate(requestDocument.getShipmentDocumentDate().toGregorianCalendar().getTime());
         document.setSeller(getFirm(requestDocument.getSeller()));
+        document.setShipper(getFirm(requestDocument.getShipper()));
         document.setBuyer(getFirm(requestDocument.getBuyer()));
+        document.setConsignee(getFirm(requestDocument.getConsignee()));
         document.setVatAmount(requestDocument.getVatAmount());
-        document.setTotal(requestDocument.getTotalAmount());
+        document.setTotalAmount(requestDocument.getTotalAmount());
 
         requestDocument.getItems().getItem().forEach(requestItem -> document.addItem(getItem(requestItem)));
         return document;
@@ -40,6 +44,7 @@ public class OutgoingUniversalTransferDocumentEndpoint {
 
     private UniversalTransferDocumentItem getItem(OutgoingUniversalTransferDocumentItem requestItem) {
         UniversalTransferDocumentItem item = new UniversalTransferDocumentItem();
+        item.setId(requestItem.getId());
         item.setName(requestItem.getName());
         item.setMeasureUnit(requestItem.getMeasureUnit());
         item.setPrice(requestItem.getPrice());
@@ -47,7 +52,7 @@ public class OutgoingUniversalTransferDocumentEndpoint {
         item.setSubTotalWithoutVatAmount(requestItem.getSubTotalWithoutVatAmount());
         item.setVatAmount(requestItem.getVatAmount());
         item.setVatRate(requestItem.getVatRate().intValue());
-        item.setSubTotal(requestItem.getSubTotalAmount());
+        item.setSubTotalAmount(requestItem.getSubTotalAmount());
         return item;
     }
 

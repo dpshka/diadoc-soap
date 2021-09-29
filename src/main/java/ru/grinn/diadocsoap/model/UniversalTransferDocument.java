@@ -10,12 +10,16 @@ import java.util.List;
 @Data
 public class UniversalTransferDocument {
 
-    private Date documentDate;
     private String documentNumber;
+    private Date documentDate;
+    private String shipmentDocumentNumber;
+    private Date shipmentDocumentDate;
     private Firm seller;
+    private Firm shipper;
     private Firm buyer;
+    private Firm consignee;
     private BigDecimal vatAmount;
-    private BigDecimal total;
+    private BigDecimal totalAmount;
 
     private List<UniversalTransferDocumentItem> items;
 

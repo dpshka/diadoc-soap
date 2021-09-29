@@ -1,6 +1,7 @@
 package ru.grinn.diadocsoap.service;
 
 import Diadoc.Api.Proto.Events.DiadocMessage_PostApiProtos;
+import Diadoc.Api.Proto.Invoicing.InvoiceInfoProtos;
 import Diadoc.Api.Proto.Invoicing.Signers.ExtendedSignerProtos;
 import Diadoc.Api.documentType.XsdContentType;
 import Diadoc.Api.exceptions.DiadocSdkException;
@@ -82,8 +83,9 @@ public class UniversalTransferDocumentService {
     private UniversalTransferDocumentWithHyphens getXmlUserDataDocument(UniversalTransferDocument document) throws DiadocSdkException {
         var xmlDocument  = new UniversalTransferDocumentWithHyphens();
 
-        xmlDocument.setDocumentNumber(document.getDocumentNumber());
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
+
+        xmlDocument.setDocumentNumber(document.getDocumentNumber());
         xmlDocument.setDocumentDate(dateFormat.format(document.getDocumentDate()));
         xmlDocument.setCurrency("643");
         xmlDocument.setFunction(applicationConfiguration.getUtdFunction());
@@ -93,16 +95,34 @@ public class UniversalTransferDocumentService {
         xmlSellers.getSeller().add(getXmlOrganizationInfo(document.getSeller()));
         xmlDocument.setSellers(xmlSellers);
 
+        var xmlShipper = new UniversalTransferDocumentWithHyphens.Shippers.Shipper();
+        xmlShipper.setOrganizationDetails(getXmlOrganizationDetails(document.getShipper()));
+        var xmlShippers = new UniversalTransferDocumentWithHyphens.Shippers();
+        xmlShippers.getShipper().add(xmlShipper);
+        xmlDocument.setShippers(xmlShippers);
+
         var xmlBuyers = new UniversalTransferDocumentWithHyphens.Buyers();
         xmlBuyers.getBuyer().add(getXmlOrganizationInfo(document.getBuyer()));
         xmlDocument.setBuyers(xmlBuyers);
+
+        var xmlConsignees = new UniversalTransferDocumentWithHyphens.Consignees();
+        xmlConsignees.getConsignee().add(getXmlOrganizationInfo(document.getConsignee()));
+        xmlDocument.setConsignees(xmlConsignees);
+
+        var xmlDocumentShipment = new UniversalTransferDocumentWithHyphens.DocumentShipments.DocumentShipment();
+        xmlDocumentShipment.setName("УПД");
+        xmlDocumentShipment.setNumber(document.getShipmentDocumentNumber());
+        xmlDocumentShipment.setDate(dateFormat.format(document.getShipmentDocumentDate()));
+        var xmlDocumentShipments = new UniversalTransferDocumentWithHyphens.DocumentShipments();
+        xmlDocumentShipments.getDocumentShipment().add(xmlDocumentShipment);
+        xmlDocument.setDocumentShipments(xmlDocumentShipments);
 
         var xmlSigners = new UniversalTransferDocumentWithHyphens.Signers();
         xmlSigners.getSignerReferenceOrSignerDetails().add(getXmlSignerDetails(document));
         xmlDocument.setSigners(xmlSigners);
 
         var xmlInvoiceTable = new InvoiceTable();
-        xmlInvoiceTable.setTotal(document.getTotal());
+        xmlInvoiceTable.setTotal(document.getTotalAmount());
         xmlInvoiceTable.setVat(document.getVatAmount());
         document.getItems().forEach(item -> xmlInvoiceTable.getItem().add(getXmlInvoiceTableItem(item)));
         xmlDocument.setTable(xmlInvoiceTable);
@@ -129,6 +149,7 @@ public class UniversalTransferDocumentService {
 
     private InvoiceTable.Item getXmlInvoiceTableItem(UniversalTransferDocumentItem item) {
         var xmlInvoiceTableItem = new InvoiceTable.Item();
+        xmlInvoiceTableItem.setItemVendorCode(item.getId());
         xmlInvoiceTableItem.setProduct(item.getName());
         xmlInvoiceTableItem.setUnit(item.getMeasureUnit());
         xmlInvoiceTableItem.setPrice(item.getPrice());
@@ -136,20 +157,23 @@ public class UniversalTransferDocumentService {
         xmlInvoiceTableItem.setSubtotalWithVatExcluded(item.getSubTotalWithoutVatAmount());
         xmlInvoiceTableItem.setTaxRate(String.format("%d%%", item.getVatRate()));
         xmlInvoiceTableItem.setVat(item.getVatAmount());
-        xmlInvoiceTableItem.setSubtotal(item.getSubTotal());
+        xmlInvoiceTableItem.setSubtotal(item.getSubTotalAmount());
         return xmlInvoiceTableItem;
     }
 
-    private ExtendedOrganizationInfoWithHyphens getXmlOrganizationInfo(Firm firm) throws DiadocSdkException {
+    private ExtendedOrganizationDetailsWithHyphens getXmlOrganizationDetails(Firm firm) {
         var xmlOrganisationDetails = new ExtendedOrganizationDetailsWithHyphens();
         xmlOrganisationDetails.setInn(firm.getInn());
         xmlOrganisationDetails.setKpp(firm.getKpp());
         xmlOrganisationDetails.setOrgName(firm.getName());
         xmlOrganisationDetails.setOrgType("1"); // TO DO
         xmlOrganisationDetails.setAddress(getXmlAddress(firm.getAddress()));
+        return xmlOrganisationDetails;
+    }
 
+    private ExtendedOrganizationInfoWithHyphens getXmlOrganizationInfo(Firm firm) throws DiadocSdkException {
         var xmlOrganisationInfo = new ExtendedOrganizationInfoWithHyphens();
-        xmlOrganisationInfo.setOrganizationDetails(xmlOrganisationDetails);
+        xmlOrganisationInfo.setOrganizationDetails(getXmlOrganizationDetails(firm));
         return xmlOrganisationInfo;
     }
 

@@ -16,8 +16,12 @@
     <xs:sequence>
       <xs:element name="DocumentNumber" type="xs:string"/>
       <xs:element name="DocumentDate" type="xs:date"/>
+      <xs:element name="ShipmentDocumentNumber" type="xs:string"/>
+      <xs:element name="ShipmentDocumentDate" type="xs:date"/>
       <xs:element name="Seller" type="edo:OutgoingUniversalTransferDocumentFirm"/>
+      <xs:element name="Shipper" type="edo:OutgoingUniversalTransferDocumentFirm"/>
       <xs:element name="Buyer" type="edo:OutgoingUniversalTransferDocumentFirm"/>
+      <xs:element name="Consignee" type="edo:OutgoingUniversalTransferDocumentFirm"/>
       <xs:element name="VatAmount" type="xs:decimal"/>
       <xs:element name="TotalAmount" type="xs:decimal"/>
       <xs:element minOccurs="0" name="Items">
@@ -55,6 +59,7 @@
 
   <xs:complexType name="OutgoingUniversalTransferDocumentItem">
     <xs:sequence>
+      <xs:element name="Id" type="xs:string"/>
       <xs:element name="Name" type="xs:string"/>
       <xs:element name="MeasureUnit" type="xs:string"/>
       <xs:element name="Quantity" type="xs:decimal"/>
