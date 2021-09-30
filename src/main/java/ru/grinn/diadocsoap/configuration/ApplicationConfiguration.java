@@ -11,7 +11,10 @@ import org.springframework.stereotype.Component;
 public class ApplicationConfiguration {
     private String apiClientId;
     private String apiUrl;
+    private String login;
+    private String password;
     private String certificateAlias;
+    private String organizationInn;
     private String keyPassword;
     private String utdTypeNameId;
     private String utdFunction;

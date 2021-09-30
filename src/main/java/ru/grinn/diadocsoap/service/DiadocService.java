@@ -8,6 +8,7 @@ import Diadoc.Api.exceptions.DiadocSdkException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.Credentials;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.grinn.diadocsoap.configuration.ApplicationConfiguration;
 
@@ -16,10 +17,6 @@ import java.util.List;
 
 @Service @Slf4j
 public class DiadocService {
-    private final static String LOGIN = "timur.konic@gmail.com";
-    private final static String PASSWORD = "ndLMsZxe4Fc4WP";
-
-    private final static String MY_ORGANIZATION_INN = "9681399131";
     private final static String TEST_ORGANIZATION_INN = "9637612488";
 
     private final ApplicationConfiguration applicationConfiguration;
@@ -30,19 +27,21 @@ public class DiadocService {
     private final OrganizationProtos.Organization testOrganization;
     private final String testOrganizationBoxId;
 
+    @Autowired
     public DiadocService(ApplicationConfiguration applicationConfiguration) throws DiadocSdkException {
         this.applicationConfiguration = applicationConfiguration;
 
         api = new DiadocApi(applicationConfiguration.getApiClientId(), applicationConfiguration.getApiUrl());
-        authentificate();
-        myOrganization = getOrganization(MY_ORGANIZATION_INN);
+        authenticate();
+
+        myOrganization = getOrganization(applicationConfiguration.getOrganizationInn());
         myOrganizationBoxId = getBoxId(myOrganization);
         testOrganization = getOrganization(TEST_ORGANIZATION_INN);
         testOrganizationBoxId = getBoxId(testOrganization);
     }
 
-    private void authentificate() throws DiadocSdkException {
-        api.getAuthClient().authenticate(LOGIN, PASSWORD);
+    private void authenticate() throws DiadocSdkException {
+        api.getAuthClient().authenticate(applicationConfiguration.getLogin(), applicationConfiguration.getPassword());
         Credentials credentials = api.getAuthManager().getCredentialsProvider().getCredentials(AuthScope.ANY);
         if (credentials instanceof DiadocCredentials diadocCredentials) {
             var token = diadocCredentials.getAuthToken();
@@ -84,6 +83,25 @@ public class DiadocService {
 
     public String getTestBoxId() throws DiadocSdkException {
         return testOrganizationBoxId;
+    }
+
+    private void saveUserContractXsd(String filename) throws Exception {
+        var content = api.getDocumentTypeClient().getContent(applicationConfiguration.getUtdTypeNameId(), applicationConfiguration.getUtdFunction(), applicationConfiguration.getUtdVersion(), 0,  XsdContentType.UserContractXsd);
+        var output = new FileOutputStream(filename);
+        output.write(content.getBytes());
+        output.close();
+    }
+
+    public byte[] generateUniversalTransferDocumentTitle(byte [] document) throws DiadocSdkException {
+        var generatedTitle = api.getGenerateClient().generateTitleXml(myOrganizationBoxId,
+                applicationConfiguration.getUtdTypeNameId(),
+                applicationConfiguration.getUtdFunction(),
+                applicationConfiguration.getUtdVersion(),
+                0,
+                document,
+                "",
+                "");
+        return generatedTitle.getContent();
     }
 
 }

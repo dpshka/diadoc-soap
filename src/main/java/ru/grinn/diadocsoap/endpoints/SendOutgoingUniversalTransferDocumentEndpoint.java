@@ -10,19 +10,35 @@ import ru.grinn.diadocsoap.model.FirmAddress;
 import ru.grinn.diadocsoap.model.Firm;
 import ru.grinn.diadocsoap.model.UniversalTransferDocument;
 import ru.grinn.diadocsoap.model.UniversalTransferDocumentItem;
-import ru.grinn.diadocsoap.service.UniversalTransferDocumentService;
+import ru.grinn.diadocsoap.service.OutgoingUniversalTransferDocumentService;
 import ru.grinn.diadocsoap.xjs.*;
 
 @Endpoint
-public class OutgoingUniversalTransferDocumentEndpoint {
+public class SendOutgoingUniversalTransferDocumentEndpoint {
 
     private static final String NAMESPACE_URI = "http://www.grinn-corp.ru/gestori/edo";
 
-    private final UniversalTransferDocumentService universalTransferDocumentService;
+    private final OutgoingUniversalTransferDocumentService outgoingUniversalTransferDocumentService;
 
     @Autowired
-    public OutgoingUniversalTransferDocumentEndpoint(UniversalTransferDocumentService universalTransferDocumentService) {
-        this.universalTransferDocumentService = universalTransferDocumentService;
+    public SendOutgoingUniversalTransferDocumentEndpoint(OutgoingUniversalTransferDocumentService outgoingUniversalTransferDocumentService) {
+        this.outgoingUniversalTransferDocumentService = outgoingUniversalTransferDocumentService;
+    }
+
+    @PayloadRoot(namespace = NAMESPACE_URI, localPart = "SendOutgoingUniversalTransferDocumentRequest")
+    @ResponsePayload
+    public SendOutgoingUniversalTransferDocumentResponse send(@RequestPayload SendOutgoingUniversalTransferDocumentRequest request) {
+        var response = new SendOutgoingUniversalTransferDocumentResponse();
+        try {
+            var document = getDocument(request.getDocument());
+            outgoingUniversalTransferDocumentService.sendDocument(document);
+            response.setResult(String.format("Накладная %s от %s отправлена", request.getDocument().getDocumentNumber(), request.getDocument().getDocumentDate().toString()));
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            response.setResult("Ошибка отправки накладной " + e.getMessage());
+        }
+        return response;
     }
 
     private UniversalTransferDocument getDocument(OutgoingUniversalTransferDocument requestDocument) throws Exception {
@@ -88,19 +104,4 @@ public class OutgoingUniversalTransferDocumentEndpoint {
         return firm;
     }
 
-    @PayloadRoot(namespace = NAMESPACE_URI, localPart = "SendOutgoingUniversalTransferDocumentRequest")
-    @ResponsePayload
-    public SendOutgoingUniversalTransferDocumentResponse send(@RequestPayload SendOutgoingUniversalTransferDocumentRequest request) {
-        var response = new SendOutgoingUniversalTransferDocumentResponse();
-        try {
-            var document = getDocument(request.getDocument());
-            universalTransferDocumentService.buildDocument(document);
-            response.setResult(String.format("Накладная %s от %s отправлена", request.getDocument().getDocumentNumber(), request.getDocument().getDocumentDate().toString()));
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-            response.setResult("Ошибка отправки накладной");
-        }
-        return response;
-    }
 }

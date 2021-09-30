@@ -2,6 +2,7 @@ package ru.grinn.diadocsoap.service;
 
 import Diadoc.Api.CertificateHelper;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.CryptoPro.JCP.JCP;
 import ru.grinn.diadocsoap.configuration.ApplicationConfiguration;
@@ -19,6 +20,7 @@ public class CertificateService {
     private final PrivateKey privateKey;
     private final X509Certificate x509Certificate;
 
+    @Autowired
     public CertificateService(ApplicationConfiguration applicationConfiguration) throws Exception {
         this.applicationConfiguration = applicationConfiguration;
 

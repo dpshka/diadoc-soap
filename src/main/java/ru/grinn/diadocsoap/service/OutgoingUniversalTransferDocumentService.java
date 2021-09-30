@@ -1,11 +1,11 @@
 package ru.grinn.diadocsoap.service;
 
 import Diadoc.Api.Proto.Events.DiadocMessage_PostApiProtos;
-import Diadoc.Api.Proto.Invoicing.InvoiceInfoProtos;
 import Diadoc.Api.Proto.Invoicing.Signers.ExtendedSignerProtos;
-import Diadoc.Api.documentType.XsdContentType;
+import Diadoc.Api.document.DocumentsFilter;
 import Diadoc.Api.exceptions.DiadocSdkException;
 import com.google.protobuf.ByteString;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.grinn.diadocsoap.configuration.ApplicationConfiguration;
@@ -16,49 +16,33 @@ import ru.grinn.diadocsoap.model.UniversalTransferDocumentItem;
 import ru.grinn.diadocsoap.xjs.*;
 
 import javax.xml.bind.JAXBContext;
-import javax.xml.bind.Marshaller;
 import java.io.ByteArrayOutputStream;
-import java.io.FileOutputStream;
 import java.math.BigInteger;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 
-@Service
-public class UniversalTransferDocumentService {
+@Service @Slf4j
+public class OutgoingUniversalTransferDocumentService {
     private final DiadocService diadocService;
     private final CertificateService certificateService;
     private final ApplicationConfiguration applicationConfiguration;
 
     @Autowired
-    public UniversalTransferDocumentService(DiadocService diadocService, CertificateService certificateService, ApplicationConfiguration applicationConfiguration) {
+    public OutgoingUniversalTransferDocumentService(DiadocService diadocService, CertificateService certificateService, ApplicationConfiguration applicationConfiguration) {
         this.diadocService = diadocService;
         this.certificateService = certificateService;
         this.applicationConfiguration = applicationConfiguration;
     }
 
-    public void buildDocument(UniversalTransferDocument document) throws Exception {
+    public void sendDocument(UniversalTransferDocument document) throws Exception {
         UniversalTransferDocumentWithHyphens xmlDocument = getXmlUserDataDocument(document);
 
-        JAXBContext context = JAXBContext.newInstance(UniversalTransferDocumentWithHyphens.class);
-        Marshaller m = context.createMarshaller();
+        var marshaller = JAXBContext.newInstance(UniversalTransferDocumentWithHyphens.class).createMarshaller();
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        marshaller.marshal(xmlDocument, stream);
 
-//        FileOutputStream f = new FileOutputStream("d:/temp/userdata.xml");
-//        m.marshal(xmlDocument, f);
-//        f.close();
-
-        ByteArrayOutputStream s = new ByteArrayOutputStream();
-        m.marshal(xmlDocument, s);
-
-        var generatedTitle = diadocService.getApi().getGenerateClient().generateTitleXml(
-                diadocService.getMyBoxId(),
-                applicationConfiguration.getUtdTypeNameId(),
-                applicationConfiguration.getUtdFunction(),
-                applicationConfiguration.getUtdVersion(),
-                0,
-                s.toByteArray(),
-                "",
-                "");
-
-        byte[] signature = certificateService.sign(generatedTitle.getContent());
+        byte[] generatedDocument = diadocService.generateUniversalTransferDocumentTitle(stream.toByteArray());
+        byte[] signature = certificateService.sign(generatedDocument);
 
         var documentAttachmentBuilder = DiadocMessage_PostApiProtos.DocumentAttachment.newBuilder();
         documentAttachmentBuilder.setTypeNamedId(applicationConfiguration.getUtdTypeNameId());
@@ -66,7 +50,7 @@ public class UniversalTransferDocumentService {
         documentAttachmentBuilder.setVersion(applicationConfiguration.getUtdVersion());
 
         var signedContentBuilder = DiadocMessage_PostApiProtos.SignedContent.newBuilder();
-        signedContentBuilder.setContent(ByteString.copyFrom(generatedTitle.getContent()));
+        signedContentBuilder.setContent(ByteString.copyFrom(generatedDocument));
         signedContentBuilder.setSignature(ByteString.copyFrom(signature));
         documentAttachmentBuilder.setSignedContent(signedContentBuilder);
 
@@ -76,8 +60,8 @@ public class UniversalTransferDocumentService {
         messageToPostBuilder.setToBoxId(diadocService.getTestBoxId());
 
         var response = diadocService.getApi().getMessageClient().postMessage(messageToPostBuilder.build());
-        System.out.println("returned message's id " + response.getMessageId());
-        System.out.println("returned message's type " + response.getMessageType().name());
+        log.debug("returned message's id " + response.getMessageId());
+        log.debug("returned message's type " + response.getMessageType().name());
     }
 
     private UniversalTransferDocumentWithHyphens getXmlUserDataDocument(UniversalTransferDocument document) throws DiadocSdkException {
@@ -191,13 +175,6 @@ public class UniversalTransferDocumentService {
         var xmlAddress = new Address();
         xmlAddress.setRussianAddress(xmlRussianAddress);
         return xmlAddress;
-    }
-
-    private void saveUserContractXsd(String filename) throws Exception {
-        var content = diadocService.getApi().getDocumentTypeClient().getContent(applicationConfiguration.getUtdTypeNameId(), applicationConfiguration.getUtdFunction(), applicationConfiguration.getUtdVersion(), 0,  XsdContentType.UserContractXsd);
-        var output = new FileOutputStream(filename);
-        output.write(content.getBytes());
-        output.close();
     }
 
 }
