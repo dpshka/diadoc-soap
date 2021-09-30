@@ -1,7 +1,10 @@
 package ru.grinn.diadocsoap.service;
 
 import Diadoc.Api.DiadocApi;
+import Diadoc.Api.Proto.DocumentTypeProtos;
+import Diadoc.Api.Proto.Documents.DocumentProtos;
 import Diadoc.Api.Proto.OrganizationProtos;
+import Diadoc.Api.Proto.SignatureInfoProtos;
 import Diadoc.Api.auth.DiadocCredentials;
 import Diadoc.Api.documentType.XsdContentType;
 import Diadoc.Api.exceptions.DiadocSdkException;
@@ -60,13 +63,10 @@ public class DiadocService {
 
     public String getBoxId(OrganizationProtos.Organization organization) throws DiadocSdkException {
         List<OrganizationProtos.Box> boxes = organization.getBoxesList();
-        if (boxes.size() == 0) {
-            throw new DiadocSdkException("Box count = 0");
-        }
         if (boxes.size() > 1) {
             log.info("Found {} boxes for organisation {}. Getting first...", boxes.size(), organization.getFullName());
         }
-        return boxes.get(0).getBoxId();
+        return boxes.stream().findFirst().orElseThrow(() -> new DiadocSdkException("Box count = 0")).getBoxId();
     }
 
     public OrganizationProtos.Organization getMyOrganization() throws DiadocSdkException {
@@ -102,6 +102,14 @@ public class DiadocService {
                 "",
                 "");
         return generatedTitle.getContent();
+    }
+
+    public DocumentProtos.Document getDocument(String messageId) throws DiadocSdkException {
+        var documentList = api.getDocumentClient().getDocumentsByMessageId(getMyBoxId(), messageId);
+        return documentList.getDocumentsList().stream()
+                .filter(document -> document.getDocumentType().equals(DocumentTypeProtos.DocumentType.UniversalTransferDocument)).
+                findFirst().
+                orElseThrow(() -> new DiadocSdkException("Universal transfer document not found in message"));
     }
 
 }

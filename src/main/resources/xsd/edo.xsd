@@ -74,7 +74,9 @@
   <xs:element name="SendOutgoingUniversalTransferDocumentResponse">
     <xs:complexType>
       <xs:sequence>
-        <xs:element name="Result" type="xs:string"/>
+        <xs:element name="StatusCode" type="xs:string"/>
+        <xs:element name="StatusMessage" type="xs:string"/>
+        <xs:element name="MessageId" type="xs:string"/>
       </xs:sequence>
     </xs:complexType>
   </xs:element>
@@ -85,14 +87,14 @@
       <xs:element name="DocumentDate" type="xs:date"/>
       <xs:element name="VatAmount" type="xs:decimal"/>
       <xs:element name="TotalAmount" type="xs:decimal"/>
+      <xs:element name="SignatureStatus" type="xs:string"/>
     </xs:sequence>
   </xs:complexType>
 
   <xs:element name="GetOutgoingUniversalTransferDocumentStatusRequest">
     <xs:complexType>
       <xs:sequence>
-        <xs:element name="DocumentNumber" type="xs:string"/>
-        <xs:element name="DocumentDate" type="xs:date"/>
+        <xs:element name="MessageId" type="xs:string"/>
       </xs:sequence>
     </xs:complexType>
   </xs:element>
@@ -101,7 +103,7 @@
     <xs:complexType>
       <xs:sequence>
         <xs:element name="Document" type="edo:OutgoingUniversalTransferDocumentStatus"/>
-        <xs:element name="Status" type="xs:string"/>
+        <xs:element name="StatusCode" type="xs:string"/>
         <xs:element name="StatusMessage" type="xs:string"/>
       </xs:sequence>
     </xs:complexType>

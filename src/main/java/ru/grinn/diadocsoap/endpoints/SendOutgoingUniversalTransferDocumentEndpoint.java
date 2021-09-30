@@ -6,10 +6,7 @@ import org.springframework.ws.server.endpoint.annotation.PayloadRoot;
 import org.springframework.ws.server.endpoint.annotation.RequestPayload;
 import org.springframework.ws.server.endpoint.annotation.ResponsePayload;
 
-import ru.grinn.diadocsoap.model.FirmAddress;
-import ru.grinn.diadocsoap.model.Firm;
-import ru.grinn.diadocsoap.model.UniversalTransferDocument;
-import ru.grinn.diadocsoap.model.UniversalTransferDocumentItem;
+import ru.grinn.diadocsoap.model.*;
 import ru.grinn.diadocsoap.service.OutgoingUniversalTransferDocumentService;
 import ru.grinn.diadocsoap.xjs.*;
 
@@ -31,12 +28,15 @@ public class SendOutgoingUniversalTransferDocumentEndpoint {
         var response = new SendOutgoingUniversalTransferDocumentResponse();
         try {
             var document = getDocument(request.getDocument());
-            outgoingUniversalTransferDocumentService.sendDocument(document);
-            response.setResult(String.format("Накладная %s от %s отправлена", request.getDocument().getDocumentNumber(), request.getDocument().getDocumentDate().toString()));
+            String messageId = outgoingUniversalTransferDocumentService.sendDocument(document);
+            response.setMessageId(messageId);
+            response.setStatusCode("OK");
+            response.setStatusMessage(String.format("Накладная %s от %s отправлена", request.getDocument().getDocumentNumber(), request.getDocument().getDocumentDate().toString()));
         }
         catch (Exception e) {
             e.printStackTrace();
-            response.setResult("Ошибка отправки накладной " + e.getMessage());
+            response.setStatusCode("ERROR");
+            response.setStatusMessage("Ошибка отправки накладной " + e.getMessage());
         }
         return response;
     }

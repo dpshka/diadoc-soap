@@ -20,6 +20,7 @@ public class UniversalTransferDocument {
     private Firm consignee;
     private BigDecimal vatAmount;
     private BigDecimal totalAmount;
+    private String signatureStatus;
 
     private List<UniversalTransferDocumentItem> items;
 

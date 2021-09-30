@@ -1,6 +1,6 @@
 package ru.grinn.diadocsoap.endpoints;
 
-import java.util.Date;
+import java.util.GregorianCalendar;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ws.server.endpoint.annotation.Endpoint;
@@ -8,38 +8,47 @@ import org.springframework.ws.server.endpoint.annotation.PayloadRoot;
 import org.springframework.ws.server.endpoint.annotation.RequestPayload;
 import org.springframework.ws.server.endpoint.annotation.ResponsePayload;
 
-import ru.grinn.diadocsoap.service.OutgoingUniversalTransferDocumentService;
+import ru.grinn.diadocsoap.model.UniversalTransferDocument;
+import ru.grinn.diadocsoap.service.UniversalTransferDocumentLoaderService;
 import ru.grinn.diadocsoap.xjs.*;
+
+import javax.xml.datatype.DatatypeFactory;
 
 @Endpoint
 public class GetOutgoingUniversalTransferDocumentStatusEndpoint {
 
     private static final String NAMESPACE_URI = "http://www.grinn-corp.ru/gestori/edo";
 
-    private final OutgoingUniversalTransferDocumentService outgoingUniversalTransferDocumentService;
+    private final UniversalTransferDocumentLoaderService universalTransferDocumentLoaderService;
 
     @Autowired
-    public GetOutgoingUniversalTransferDocumentStatusEndpoint(OutgoingUniversalTransferDocumentService outgoingUniversalTransferDocumentService) {
-        this.outgoingUniversalTransferDocumentService = outgoingUniversalTransferDocumentService;
+    public GetOutgoingUniversalTransferDocumentStatusEndpoint(UniversalTransferDocumentLoaderService universalTransferDocumentLoaderService) {
+        this.universalTransferDocumentLoaderService = universalTransferDocumentLoaderService;
     }
 
     @PayloadRoot(namespace = NAMESPACE_URI, localPart = "GetOutgoingUniversalTransferDocumentStatusRequest")
     @ResponsePayload
     public GetOutgoingUniversalTransferDocumentStatusResponse send(@RequestPayload GetOutgoingUniversalTransferDocumentStatusRequest request) {
         var response = new GetOutgoingUniversalTransferDocumentStatusResponse();
-/*
         try {
-            String documentNumber = request.getDocumentNumber();
-            Date documentDate = request.getDocumentDate().toGregorianCalendar().getTime();
-            var document = getDocument(request.getDocument());
-            outgoingUniversalTransferDocumentService.sendDocument(document);
-            response.setResult(String.format("Накладная %s от %s отправлена", request.getDocument().getDocumentNumber(), request.getDocument().getDocumentDate().toString()));
+            UniversalTransferDocument document = universalTransferDocumentLoaderService.getOutgoingDocument(request.getMessageId());
+            response.setStatusCode("OK");
+            response.setStatusMessage("Документ найден");
+            var documentStatus = new OutgoingUniversalTransferDocumentStatus();
+            documentStatus.setDocumentNumber(document.getDocumentNumber());
+            GregorianCalendar gregorianCalendar = new GregorianCalendar();
+            gregorianCalendar.setTime(document.getDocumentDate());
+            documentStatus.setDocumentDate(DatatypeFactory.newInstance().newXMLGregorianCalendar(gregorianCalendar));
+            documentStatus.setVatAmount(document.getVatAmount());
+            documentStatus.setTotalAmount(document.getTotalAmount());
+            documentStatus.setSignatureStatus(document.getSignatureStatus());
+            response.setDocument(documentStatus);
         }
         catch (Exception e) {
             e.printStackTrace();
-            response.setResult("Ошибка отправки накладной " + e.getMessage());
+            response.setStatusCode("ERROR");
+            response.setStatusMessage("Not found");
         }
-*/
         return response;
     }
 

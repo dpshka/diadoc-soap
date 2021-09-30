@@ -2,24 +2,19 @@ package ru.grinn.diadocsoap.service;
 
 import Diadoc.Api.Proto.Events.DiadocMessage_PostApiProtos;
 import Diadoc.Api.Proto.Invoicing.Signers.ExtendedSignerProtos;
-import Diadoc.Api.document.DocumentsFilter;
 import Diadoc.Api.exceptions.DiadocSdkException;
 import com.google.protobuf.ByteString;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.grinn.diadocsoap.configuration.ApplicationConfiguration;
-import ru.grinn.diadocsoap.model.Firm;
-import ru.grinn.diadocsoap.model.FirmAddress;
-import ru.grinn.diadocsoap.model.UniversalTransferDocument;
-import ru.grinn.diadocsoap.model.UniversalTransferDocumentItem;
+import ru.grinn.diadocsoap.model.*;
 import ru.grinn.diadocsoap.xjs.*;
 
 import javax.xml.bind.JAXBContext;
 import java.io.ByteArrayOutputStream;
 import java.math.BigInteger;
 import java.text.SimpleDateFormat;
-import java.util.Date;
 
 @Service @Slf4j
 public class OutgoingUniversalTransferDocumentService {
@@ -34,12 +29,12 @@ public class OutgoingUniversalTransferDocumentService {
         this.applicationConfiguration = applicationConfiguration;
     }
 
-    public void sendDocument(UniversalTransferDocument document) throws Exception {
-        UniversalTransferDocumentWithHyphens xmlDocument = getXmlUserDataDocument(document);
+    public String sendDocument(UniversalTransferDocument document) throws Exception {
+        UniversalTransferDocumentWithHyphens diadocDocument = getUserDataDocument(document);
 
         var marshaller = JAXBContext.newInstance(UniversalTransferDocumentWithHyphens.class).createMarshaller();
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        marshaller.marshal(xmlDocument, stream);
+        marshaller.marshal(diadocDocument, stream);
 
         byte[] generatedDocument = diadocService.generateUniversalTransferDocumentTitle(stream.toByteArray());
         byte[] signature = certificateService.sign(generatedDocument);
@@ -59,122 +54,121 @@ public class OutgoingUniversalTransferDocumentService {
         messageToPostBuilder.setFromBoxId(diadocService.getMyBoxId());
         messageToPostBuilder.setToBoxId(diadocService.getTestBoxId());
 
-        var response = diadocService.getApi().getMessageClient().postMessage(messageToPostBuilder.build());
-        log.debug("returned message's id " + response.getMessageId());
-        log.debug("returned message's type " + response.getMessageType().name());
+        var postMessageResponse = diadocService.getApi().getMessageClient().postMessage(messageToPostBuilder.build());
+        return postMessageResponse.getMessageId();
     }
 
-    private UniversalTransferDocumentWithHyphens getXmlUserDataDocument(UniversalTransferDocument document) throws DiadocSdkException {
-        var xmlDocument  = new UniversalTransferDocumentWithHyphens();
+    private UniversalTransferDocumentWithHyphens getUserDataDocument(UniversalTransferDocument document) throws DiadocSdkException {
+        var userdataDocument  = new UniversalTransferDocumentWithHyphens();
 
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
 
-        xmlDocument.setDocumentNumber(document.getDocumentNumber());
-        xmlDocument.setDocumentDate(dateFormat.format(document.getDocumentDate()));
-        xmlDocument.setCurrency("643");
-        xmlDocument.setFunction(applicationConfiguration.getUtdFunction());
-        xmlDocument.setDocumentCreator(document.getSeller().getName());
+        userdataDocument.setDocumentNumber(document.getDocumentNumber());
+        userdataDocument.setDocumentDate(dateFormat.format(document.getDocumentDate()));
+        userdataDocument.setCurrency("643");
+        userdataDocument.setFunction(applicationConfiguration.getUtdFunction());
+        userdataDocument.setDocumentCreator(document.getSeller().getName());
 
-        var xmlSellers = new UniversalTransferDocumentWithHyphens.Sellers();
-        xmlSellers.getSeller().add(getXmlOrganizationInfo(document.getSeller()));
-        xmlDocument.setSellers(xmlSellers);
+        var diadocSellers = new UniversalTransferDocumentWithHyphens.Sellers();
+        diadocSellers.getSeller().add(getDiadocOrganizationInfo(document.getSeller()));
+        userdataDocument.setSellers(diadocSellers);
 
-        var xmlShipper = new UniversalTransferDocumentWithHyphens.Shippers.Shipper();
-        xmlShipper.setOrganizationDetails(getXmlOrganizationDetails(document.getShipper()));
-        var xmlShippers = new UniversalTransferDocumentWithHyphens.Shippers();
-        xmlShippers.getShipper().add(xmlShipper);
-        xmlDocument.setShippers(xmlShippers);
+        var diadocShipper = new UniversalTransferDocumentWithHyphens.Shippers.Shipper();
+        diadocShipper.setOrganizationDetails(getDiadocOrganizationDetails(document.getShipper()));
+        var diadocShippers = new UniversalTransferDocumentWithHyphens.Shippers();
+        diadocShippers.getShipper().add(diadocShipper);
+        userdataDocument.setShippers(diadocShippers);
 
-        var xmlBuyers = new UniversalTransferDocumentWithHyphens.Buyers();
-        xmlBuyers.getBuyer().add(getXmlOrganizationInfo(document.getBuyer()));
-        xmlDocument.setBuyers(xmlBuyers);
+        var diadocBuyers = new UniversalTransferDocumentWithHyphens.Buyers();
+        diadocBuyers.getBuyer().add(getDiadocOrganizationInfo(document.getBuyer()));
+        userdataDocument.setBuyers(diadocBuyers);
 
-        var xmlConsignees = new UniversalTransferDocumentWithHyphens.Consignees();
-        xmlConsignees.getConsignee().add(getXmlOrganizationInfo(document.getConsignee()));
-        xmlDocument.setConsignees(xmlConsignees);
+        var diadocConsignees = new UniversalTransferDocumentWithHyphens.Consignees();
+        diadocConsignees.getConsignee().add(getDiadocOrganizationInfo(document.getConsignee()));
+        userdataDocument.setConsignees(diadocConsignees);
 
-        var xmlDocumentShipment = new UniversalTransferDocumentWithHyphens.DocumentShipments.DocumentShipment();
-        xmlDocumentShipment.setName("УПД");
-        xmlDocumentShipment.setNumber(document.getShipmentDocumentNumber());
-        xmlDocumentShipment.setDate(dateFormat.format(document.getShipmentDocumentDate()));
-        var xmlDocumentShipments = new UniversalTransferDocumentWithHyphens.DocumentShipments();
-        xmlDocumentShipments.getDocumentShipment().add(xmlDocumentShipment);
-        xmlDocument.setDocumentShipments(xmlDocumentShipments);
+        var diadocDocumentShipment = new UniversalTransferDocumentWithHyphens.DocumentShipments.DocumentShipment();
+        diadocDocumentShipment.setName("УПД");
+        diadocDocumentShipment.setNumber(document.getShipmentDocumentNumber());
+        diadocDocumentShipment.setDate(dateFormat.format(document.getShipmentDocumentDate()));
+        var diadocDocumentShipments = new UniversalTransferDocumentWithHyphens.DocumentShipments();
+        diadocDocumentShipments.getDocumentShipment().add(diadocDocumentShipment);
+        userdataDocument.setDocumentShipments(diadocDocumentShipments);
 
-        var xmlSigners = new UniversalTransferDocumentWithHyphens.Signers();
-        xmlSigners.getSignerReferenceOrSignerDetails().add(getXmlSignerDetails(document));
-        xmlDocument.setSigners(xmlSigners);
+        var diadocSigners = new UniversalTransferDocumentWithHyphens.Signers();
+        diadocSigners.getSignerReferenceOrSignerDetails().add(getDoadocSignerDetails(document));
+        userdataDocument.setSigners(diadocSigners);
 
-        var xmlInvoiceTable = new InvoiceTable();
-        xmlInvoiceTable.setTotal(document.getTotalAmount());
-        xmlInvoiceTable.setVat(document.getVatAmount());
-        document.getItems().forEach(item -> xmlInvoiceTable.getItem().add(getXmlInvoiceTableItem(item)));
-        xmlDocument.setTable(xmlInvoiceTable);
+        var diadocInvoiceTable = new InvoiceTable();
+        diadocInvoiceTable.setTotal(document.getTotalAmount());
+        diadocInvoiceTable.setVat(document.getVatAmount());
+        document.getItems().forEach(item -> diadocInvoiceTable.getItem().add(getDiadocInvoiceTableItem(item)));
+        userdataDocument.setTable(diadocInvoiceTable);
 
-        var xmlTransferInfo = new TransferInfo();
-        xmlTransferInfo.setOperationInfo("Товары переданы");
-        xmlDocument.setTransferInfo(xmlTransferInfo);
+        var diadocTransferInfo = new TransferInfo();
+        diadocTransferInfo.setOperationInfo("Товары переданы");
+        userdataDocument.setTransferInfo(diadocTransferInfo);
 
-        return xmlDocument;
+        return userdataDocument;
     }
 
     // TO DO
-    private ExtendedSignerDetailsSellerTitle getXmlSignerDetails(UniversalTransferDocument document) {
-        var xmlSignerDetails = new ExtendedSignerDetailsSellerTitle();
-        xmlSignerDetails.setInn(document.getSeller().getInn());
-        xmlSignerDetails.setFirstName("Анастасия");
-        xmlSignerDetails.setMiddleName("Геннадьевна");
-        xmlSignerDetails.setLastName("Воронина");
-        xmlSignerDetails.setSignerPowers(BigInteger.valueOf(ExtendedSignerProtos.SignerPowers.ResponsibleForOperationAndSignerForInvoice_VALUE));
-        xmlSignerDetails.setSignerStatus(BigInteger.valueOf(ExtendedSignerProtos.SignerStatus.SellerEmployee_VALUE));
-        xmlSignerDetails.setSignerType(String.valueOf(ExtendedSignerProtos.SignerType.LegalEntity_VALUE));
-        return xmlSignerDetails;
+    private ExtendedSignerDetailsSellerTitle getDoadocSignerDetails(UniversalTransferDocument document) {
+        var diadocSignerDetails = new ExtendedSignerDetailsSellerTitle();
+        diadocSignerDetails.setInn(document.getSeller().getInn());
+        diadocSignerDetails.setFirstName("Анастасия");
+        diadocSignerDetails.setMiddleName("Геннадьевна");
+        diadocSignerDetails.setLastName("Воронина");
+        diadocSignerDetails.setSignerPowers(BigInteger.valueOf(ExtendedSignerProtos.SignerPowers.ResponsibleForOperationAndSignerForInvoice_VALUE));
+        diadocSignerDetails.setSignerStatus(BigInteger.valueOf(ExtendedSignerProtos.SignerStatus.SellerEmployee_VALUE));
+        diadocSignerDetails.setSignerType(String.valueOf(ExtendedSignerProtos.SignerType.LegalEntity_VALUE));
+        return diadocSignerDetails;
     }
 
-    private InvoiceTable.Item getXmlInvoiceTableItem(UniversalTransferDocumentItem item) {
-        var xmlInvoiceTableItem = new InvoiceTable.Item();
-        xmlInvoiceTableItem.setItemVendorCode(item.getId());
-        xmlInvoiceTableItem.setProduct(item.getName());
-        xmlInvoiceTableItem.setUnit(item.getMeasureUnit());
-        xmlInvoiceTableItem.setPrice(item.getPrice());
-        xmlInvoiceTableItem.setQuantity(item.getQuantity());
-        xmlInvoiceTableItem.setSubtotalWithVatExcluded(item.getSubTotalWithoutVatAmount());
-        xmlInvoiceTableItem.setTaxRate(String.format("%d%%", item.getVatRate()));
-        xmlInvoiceTableItem.setVat(item.getVatAmount());
-        xmlInvoiceTableItem.setSubtotal(item.getSubTotalAmount());
-        return xmlInvoiceTableItem;
+    private InvoiceTable.Item getDiadocInvoiceTableItem(UniversalTransferDocumentItem item) {
+        var diadocInvoiceTableItem = new InvoiceTable.Item();
+        diadocInvoiceTableItem.setItemVendorCode(item.getId());
+        diadocInvoiceTableItem.setProduct(item.getName());
+        diadocInvoiceTableItem.setUnit(item.getMeasureUnit());
+        diadocInvoiceTableItem.setPrice(item.getPrice());
+        diadocInvoiceTableItem.setQuantity(item.getQuantity());
+        diadocInvoiceTableItem.setSubtotalWithVatExcluded(item.getSubTotalWithoutVatAmount());
+        diadocInvoiceTableItem.setTaxRate(String.format("%d%%", item.getVatRate()));
+        diadocInvoiceTableItem.setVat(item.getVatAmount());
+        diadocInvoiceTableItem.setSubtotal(item.getSubTotalAmount());
+        return diadocInvoiceTableItem;
     }
 
-    private ExtendedOrganizationDetailsWithHyphens getXmlOrganizationDetails(Firm firm) {
-        var xmlOrganisationDetails = new ExtendedOrganizationDetailsWithHyphens();
-        xmlOrganisationDetails.setInn(firm.getInn());
-        xmlOrganisationDetails.setKpp(firm.getKpp());
-        xmlOrganisationDetails.setOrgName(firm.getName());
-        xmlOrganisationDetails.setOrgType("1"); // TO DO
-        xmlOrganisationDetails.setAddress(getXmlAddress(firm.getAddress()));
-        return xmlOrganisationDetails;
+    private ExtendedOrganizationDetailsWithHyphens getDiadocOrganizationDetails(Firm firm) {
+        var diadocOrganisationDetails = new ExtendedOrganizationDetailsWithHyphens();
+        diadocOrganisationDetails.setInn(firm.getInn());
+        diadocOrganisationDetails.setKpp(firm.getKpp());
+        diadocOrganisationDetails.setOrgName(firm.getName());
+        diadocOrganisationDetails.setOrgType("1"); // TO DO
+        diadocOrganisationDetails.setAddress(getDiadocAddress(firm.getAddress()));
+        return diadocOrganisationDetails;
     }
 
-    private ExtendedOrganizationInfoWithHyphens getXmlOrganizationInfo(Firm firm) throws DiadocSdkException {
-        var xmlOrganisationInfo = new ExtendedOrganizationInfoWithHyphens();
-        xmlOrganisationInfo.setOrganizationDetails(getXmlOrganizationDetails(firm));
-        return xmlOrganisationInfo;
+    private ExtendedOrganizationInfoWithHyphens getDiadocOrganizationInfo(Firm firm) throws DiadocSdkException {
+        var diadocOrganisationInfo = new ExtendedOrganizationInfoWithHyphens();
+        diadocOrganisationInfo.setOrganizationDetails(getDiadocOrganizationDetails(firm));
+        return diadocOrganisationInfo;
     }
 
-    private Address getXmlAddress(FirmAddress address) {
-        var xmlRussianAddress = new RussianAddress();
-        xmlRussianAddress.setZipCode(address.getZipCode());
-        xmlRussianAddress.setRegion(address.getRegion());
-        xmlRussianAddress.setTerritory(address.getTerritory());
-        xmlRussianAddress.setCity(address.getCity());
-        xmlRussianAddress.setLocality(address.getLocality());
-        xmlRussianAddress.setStreet(address.getStreet());
-        xmlRussianAddress.setBuilding(address.getBuilding());
-        xmlRussianAddress.setBlock(address.getBlock());
-        xmlRussianAddress.setApartment(address.getApartment());
-        var xmlAddress = new Address();
-        xmlAddress.setRussianAddress(xmlRussianAddress);
-        return xmlAddress;
+    private Address getDiadocAddress(FirmAddress address) {
+        var diadocRussianAddress = new RussianAddress();
+        diadocRussianAddress.setZipCode(address.getZipCode());
+        diadocRussianAddress.setRegion(address.getRegion());
+        diadocRussianAddress.setTerritory(address.getTerritory());
+        diadocRussianAddress.setCity(address.getCity());
+        diadocRussianAddress.setLocality(address.getLocality());
+        diadocRussianAddress.setStreet(address.getStreet());
+        diadocRussianAddress.setBuilding(address.getBuilding());
+        diadocRussianAddress.setBlock(address.getBlock());
+        diadocRussianAddress.setApartment(address.getApartment());
+        var diadocAddress = new Address();
+        diadocAddress.setRussianAddress(diadocRussianAddress);
+        return diadocAddress;
     }
 
 }
