@@ -41,7 +41,7 @@ public class SendOutgoingUniversalTransferDocumentEndpoint {
         return response;
     }
 
-    private UniversalTransferDocument getDocument(OutgoingUniversalTransferDocument requestDocument) throws Exception {
+    private UniversalTransferDocument getDocument(OutgoingUniversalTransferDocument requestDocument) {
         UniversalTransferDocument document = new UniversalTransferDocument();
         document.setDocumentNumber(requestDocument.getDocumentNumber());
         document.setDocumentDate(requestDocument.getDocumentDate().toGregorianCalendar().getTime());

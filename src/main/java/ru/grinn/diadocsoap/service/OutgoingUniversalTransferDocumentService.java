@@ -16,7 +16,8 @@ import java.io.ByteArrayOutputStream;
 import java.math.BigInteger;
 import java.text.SimpleDateFormat;
 
-@Service @Slf4j
+@Service
+@Slf4j
 public class OutgoingUniversalTransferDocumentService {
     private final DiadocService diadocService;
     private final CertificateService certificateService;
@@ -58,7 +59,7 @@ public class OutgoingUniversalTransferDocumentService {
         return postMessageResponse.getMessageId();
     }
 
-    private UniversalTransferDocumentWithHyphens getUserDataDocument(UniversalTransferDocument document) throws DiadocSdkException {
+    private UniversalTransferDocumentWithHyphens getUserDataDocument(UniversalTransferDocument document) {
         var userdataDocument  = new UniversalTransferDocumentWithHyphens();
 
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
@@ -112,13 +113,12 @@ public class OutgoingUniversalTransferDocumentService {
         return userdataDocument;
     }
 
-    // TO DO
     private ExtendedSignerDetailsSellerTitle getDoadocSignerDetails(UniversalTransferDocument document) {
         var diadocSignerDetails = new ExtendedSignerDetailsSellerTitle();
         diadocSignerDetails.setInn(document.getSeller().getInn());
-        diadocSignerDetails.setFirstName("Анастасия");
-        diadocSignerDetails.setMiddleName("Геннадьевна");
-        diadocSignerDetails.setLastName("Воронина");
+        diadocSignerDetails.setFirstName(applicationConfiguration.getSignerFirstName());
+        diadocSignerDetails.setMiddleName(applicationConfiguration.getSignerMiddleName());
+        diadocSignerDetails.setLastName(applicationConfiguration.getSignerLastName());
         diadocSignerDetails.setSignerPowers(BigInteger.valueOf(ExtendedSignerProtos.SignerPowers.ResponsibleForOperationAndSignerForInvoice_VALUE));
         diadocSignerDetails.setSignerStatus(BigInteger.valueOf(ExtendedSignerProtos.SignerStatus.SellerEmployee_VALUE));
         diadocSignerDetails.setSignerType(String.valueOf(ExtendedSignerProtos.SignerType.LegalEntity_VALUE));
@@ -144,12 +144,12 @@ public class OutgoingUniversalTransferDocumentService {
         diadocOrganisationDetails.setInn(firm.getInn());
         diadocOrganisationDetails.setKpp(firm.getKpp());
         diadocOrganisationDetails.setOrgName(firm.getName());
-        diadocOrganisationDetails.setOrgType("1"); // TO DO
+        diadocOrganisationDetails.setOrgType(firm.getKpp() != null && firm.getKpp().length() > 0 ? "1" : "2");
         diadocOrganisationDetails.setAddress(getDiadocAddress(firm.getAddress()));
         return diadocOrganisationDetails;
     }
 
-    private ExtendedOrganizationInfoWithHyphens getDiadocOrganizationInfo(Firm firm) throws DiadocSdkException {
+    private ExtendedOrganizationInfoWithHyphens getDiadocOrganizationInfo(Firm firm) {
         var diadocOrganisationInfo = new ExtendedOrganizationInfoWithHyphens();
         diadocOrganisationInfo.setOrganizationDetails(getDiadocOrganizationDetails(firm));
         return diadocOrganisationInfo;

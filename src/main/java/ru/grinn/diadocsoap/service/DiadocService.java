@@ -4,7 +4,6 @@ import Diadoc.Api.DiadocApi;
 import Diadoc.Api.Proto.DocumentTypeProtos;
 import Diadoc.Api.Proto.Documents.DocumentProtos;
 import Diadoc.Api.Proto.OrganizationProtos;
-import Diadoc.Api.Proto.SignatureInfoProtos;
 import Diadoc.Api.auth.DiadocCredentials;
 import Diadoc.Api.documentType.XsdContentType;
 import Diadoc.Api.exceptions.DiadocSdkException;
@@ -18,7 +17,8 @@ import ru.grinn.diadocsoap.configuration.ApplicationConfiguration;
 import java.io.FileOutputStream;
 import java.util.List;
 
-@Service @Slf4j
+@Service
+@Slf4j
 public class DiadocService {
     private final static String TEST_ORGANIZATION_INN = "9637612488";
 
@@ -51,7 +51,7 @@ public class DiadocService {
             log.info("Successfull authentification, token = {}", token);
         }
         else {
-            throw new RuntimeException("token is not DiadocCredentials");
+            throw new RuntimeException("Token is not DiadocCredentials");
         }
     }
 
@@ -69,19 +69,19 @@ public class DiadocService {
         return boxes.stream().findFirst().orElseThrow(() -> new DiadocSdkException("Box count = 0")).getBoxId();
     }
 
-    public OrganizationProtos.Organization getMyOrganization() throws DiadocSdkException {
+    public OrganizationProtos.Organization getMyOrganization() {
         return myOrganization;
     }
 
-    public String getMyBoxId() throws DiadocSdkException {
+    public String getMyBoxId() {
         return myOrganizationBoxId;
     }
 
-    public OrganizationProtos.Organization getTestOrganization() throws DiadocSdkException {
+    public OrganizationProtos.Organization getTestOrganization() {
         return testOrganization;
     }
 
-    public String getTestBoxId() throws DiadocSdkException {
+    public String getTestBoxId() {
         return testOrganizationBoxId;
     }
 
@@ -107,9 +107,9 @@ public class DiadocService {
     public DocumentProtos.Document getDocument(String messageId) throws DiadocSdkException {
         var documentList = api.getDocumentClient().getDocumentsByMessageId(getMyBoxId(), messageId);
         return documentList.getDocumentsList().stream()
-                .filter(document -> document.getDocumentType().equals(DocumentTypeProtos.DocumentType.UniversalTransferDocument)).
-                findFirst().
-                orElseThrow(() -> new DiadocSdkException("Universal transfer document not found in message"));
+                .filter(document -> document.getDocumentType().equals(DocumentTypeProtos.DocumentType.UniversalTransferDocument))
+                .findFirst()
+                .orElseThrow(() -> new DiadocSdkException("Universal transfer document not found in message"));
     }
 
 }

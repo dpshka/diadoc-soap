@@ -2,7 +2,6 @@ package ru.grinn.diadocsoap.configuration;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -19,4 +18,7 @@ public class ApplicationConfiguration {
     private String utdTypeNameId;
     private String utdFunction;
     private String utdVersion;
+    private String signerFirstName;
+    private String signerMiddleName;
+    private String signerLastName;
 }
