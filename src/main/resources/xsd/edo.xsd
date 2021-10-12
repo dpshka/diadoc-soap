@@ -24,6 +24,7 @@
       <xs:element name="Consignee" type="edo:OutgoingUniversalTransferDocumentFirm"/>
       <xs:element name="VatAmount" type="xs:decimal"/>
       <xs:element name="TotalAmount" type="xs:decimal"/>
+      <xs:element name="TotalWithoutVatAmount" type="xs:decimal"/>
       <xs:element minOccurs="0" name="Items">
         <xs:complexType>
           <xs:sequence>

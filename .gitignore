@@ -1,3 +1,4 @@
 /target/
 /.idea/
 /src/main/resources/application.properties
+/src/main/java/ru/grinn/diadocsoap/xjs/
