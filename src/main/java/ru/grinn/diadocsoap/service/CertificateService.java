@@ -20,7 +20,6 @@ public class CertificateService {
     private final PrivateKey privateKey;
     private final X509Certificate x509Certificate;
 
-    @Autowired
     public CertificateService(ApplicationConfiguration applicationConfiguration) throws Exception {
         this.applicationConfiguration = applicationConfiguration;
 

@@ -4,6 +4,7 @@ import Diadoc.Api.Proto.Events.DiadocMessage_PostApiProtos;
 import Diadoc.Api.Proto.Invoicing.Signers.ExtendedSignerProtos;
 import Diadoc.Api.exceptions.DiadocSdkException;
 import com.google.protobuf.ByteString;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,17 +19,11 @@ import java.text.SimpleDateFormat;
 
 @Service
 @Slf4j
+@AllArgsConstructor
 public class OutgoingUniversalTransferDocumentService {
     private final DiadocService diadocService;
     private final CertificateService certificateService;
     private final ApplicationConfiguration applicationConfiguration;
-
-    @Autowired
-    public OutgoingUniversalTransferDocumentService(DiadocService diadocService, CertificateService certificateService, ApplicationConfiguration applicationConfiguration) {
-        this.diadocService = diadocService;
-        this.certificateService = certificateService;
-        this.applicationConfiguration = applicationConfiguration;
-    }
 
     public String sendDocument(UniversalTransferDocument document) throws Exception {
         UniversalTransferDocumentWithHyphens diadocDocument = getUserDataDocument(document);

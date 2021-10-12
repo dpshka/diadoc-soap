@@ -30,7 +30,6 @@ public class DiadocService {
     //private final OrganizationProtos.Organization testOrganization;
     //private final String testOrganizationBoxId;
 
-    @Autowired
     public DiadocService(ApplicationConfiguration applicationConfiguration) throws DiadocSdkException {
         this.applicationConfiguration = applicationConfiguration;
 

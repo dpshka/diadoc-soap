@@ -2,6 +2,7 @@ package ru.grinn.diadocsoap.endpoints;
 
 import java.util.GregorianCalendar;
 
+import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ws.server.endpoint.annotation.Endpoint;
 import org.springframework.ws.server.endpoint.annotation.PayloadRoot;
@@ -15,16 +16,12 @@ import ru.grinn.diadocsoap.xjs.*;
 import javax.xml.datatype.DatatypeFactory;
 
 @Endpoint
+@AllArgsConstructor
 public class GetOutgoingUniversalTransferDocumentStatusEndpoint {
 
     private static final String NAMESPACE_URI = "http://www.grinn-corp.ru/gestori/edo";
 
     private final UniversalTransferDocumentLoaderService universalTransferDocumentLoaderService;
-
-    @Autowired
-    public GetOutgoingUniversalTransferDocumentStatusEndpoint(UniversalTransferDocumentLoaderService universalTransferDocumentLoaderService) {
-        this.universalTransferDocumentLoaderService = universalTransferDocumentLoaderService;
-    }
 
     @PayloadRoot(namespace = NAMESPACE_URI, localPart = "GetOutgoingUniversalTransferDocumentStatusRequest")
     @ResponsePayload

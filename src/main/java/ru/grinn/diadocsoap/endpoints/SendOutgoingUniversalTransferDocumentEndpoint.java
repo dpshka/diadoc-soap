@@ -1,5 +1,6 @@
 package ru.grinn.diadocsoap.endpoints;
 
+import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ws.server.endpoint.annotation.Endpoint;
 import org.springframework.ws.server.endpoint.annotation.PayloadRoot;
@@ -11,16 +12,12 @@ import ru.grinn.diadocsoap.service.OutgoingUniversalTransferDocumentService;
 import ru.grinn.diadocsoap.xjs.*;
 
 @Endpoint
+@AllArgsConstructor
 public class SendOutgoingUniversalTransferDocumentEndpoint {
 
     private static final String NAMESPACE_URI = "http://www.grinn-corp.ru/gestori/edo";
 
     private final OutgoingUniversalTransferDocumentService outgoingUniversalTransferDocumentService;
-
-    @Autowired
-    public SendOutgoingUniversalTransferDocumentEndpoint(OutgoingUniversalTransferDocumentService outgoingUniversalTransferDocumentService) {
-        this.outgoingUniversalTransferDocumentService = outgoingUniversalTransferDocumentService;
-    }
 
     @PayloadRoot(namespace = NAMESPACE_URI, localPart = "SendOutgoingUniversalTransferDocumentRequest")
     @ResponsePayload

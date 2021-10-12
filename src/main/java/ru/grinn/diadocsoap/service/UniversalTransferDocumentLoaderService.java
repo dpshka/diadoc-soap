@@ -1,5 +1,6 @@
 package ru.grinn.diadocsoap.service;
 
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -10,13 +11,9 @@ import java.text.SimpleDateFormat;
 
 @Service
 @Slf4j
+@AllArgsConstructor
 public class UniversalTransferDocumentLoaderService {
     private final DiadocService diadocService;
-
-    @Autowired
-    public UniversalTransferDocumentLoaderService(DiadocService diadocService) {
-        this.diadocService = diadocService;
-    }
 
     public UniversalTransferDocument getOutgoingDocument(String messageId) throws Exception {
         var document = new UniversalTransferDocument();
