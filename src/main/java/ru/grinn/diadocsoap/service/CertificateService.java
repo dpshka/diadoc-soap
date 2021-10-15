@@ -2,7 +2,6 @@ package ru.grinn.diadocsoap.service;
 
 import Diadoc.Api.CertificateHelper;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.CryptoPro.JCP.JCP;
 import ru.grinn.diadocsoap.configuration.ApplicationConfiguration;

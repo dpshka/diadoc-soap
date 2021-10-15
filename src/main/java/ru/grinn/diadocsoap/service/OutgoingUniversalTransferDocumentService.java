@@ -2,11 +2,9 @@ package ru.grinn.diadocsoap.service;
 
 import Diadoc.Api.Proto.Events.DiadocMessage_PostApiProtos;
 import Diadoc.Api.Proto.Invoicing.Signers.ExtendedSignerProtos;
-import Diadoc.Api.exceptions.DiadocSdkException;
 import com.google.protobuf.ByteString;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.grinn.diadocsoap.configuration.ApplicationConfiguration;
 import ru.grinn.diadocsoap.model.*;

@@ -10,11 +10,11 @@ import Diadoc.Api.exceptions.DiadocSdkException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.Credentials;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.grinn.diadocsoap.configuration.ApplicationConfiguration;
 
 import java.io.FileOutputStream;
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -25,6 +25,10 @@ public class DiadocService {
     private final ApplicationConfiguration applicationConfiguration;
 
     private final DiadocApi api;
+
+    private Date lastAuthDate;
+    private static final long AUTH_PERIOD_IN_MILLIS = 1000 * 60 * 60 * 6;
+
     private final OrganizationProtos.Organization myOrganization;
     private final String myOrganizationBoxId;
     //private final OrganizationProtos.Organization testOrganization;
@@ -48,13 +52,24 @@ public class DiadocService {
         if (credentials instanceof DiadocCredentials diadocCredentials) {
             var token = diadocCredentials.getAuthToken();
             log.info("Successfull authentification, token = {}", token);
+            lastAuthDate = new Date();
         }
         else {
             throw new RuntimeException("Token is not DiadocCredentials");
         }
     }
 
-    public DiadocApi getApi() { return api; }
+    public DiadocApi getApi() {
+        if (lastAuthDate != null && (new Date().getTime() - lastAuthDate.getTime()) > AUTH_PERIOD_IN_MILLIS) {
+            try {
+                authenticate();
+            }
+            catch (DiadocSdkException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return api;
+    }
 
     public OrganizationProtos.Organization getOrganization(String inn) throws DiadocSdkException {
         return api.getOrganizationClient().getOrganizationByInn(inn);
