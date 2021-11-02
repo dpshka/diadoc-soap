@@ -60,7 +60,7 @@ public class DiadocService {
     }
 
     public DiadocApi getApi() {
-        if (lastAuthDate != null && (new Date().getTime() - lastAuthDate.getTime()) > AUTH_PERIOD_IN_MILLIS) {
+        if (lastAuthDate == null || (new Date().getTime() - lastAuthDate.getTime()) > AUTH_PERIOD_IN_MILLIS) {
             try {
                 authenticate();
             }
