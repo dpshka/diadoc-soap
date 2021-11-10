@@ -72,7 +72,7 @@ public class DiadocService {
     }
 
     public OrganizationProtos.Organization getOrganization(String inn) throws DiadocSdkException {
-        return api.getOrganizationClient().getOrganizationByInn(inn);
+        return getApi().getOrganizationClient().getOrganizationByInn(inn);
     }
 
     public String getBoxId(OrganizationProtos.Organization organization) throws DiadocSdkException {
@@ -89,7 +89,7 @@ public class DiadocService {
 
     public String getMyDepartmentId(String kpp) {
         try {
-            return api.getDepartmentClient()
+            return getApi().getDepartmentClient()
                     .getDepartments(myOrganizationBoxId)
                     .getDepartmentsList()
                     .stream()
@@ -116,14 +116,14 @@ public class DiadocService {
 //    }
 
     private void saveUserContractXsd(String filename) throws Exception {
-        var content = api.getDocumentTypeClient().getContent(applicationConfiguration.getUtdTypeNameId(), applicationConfiguration.getUtdFunction(), applicationConfiguration.getUtdVersion(), 0,  XsdContentType.UserContractXsd);
+        var content = getApi().getDocumentTypeClient().getContent(applicationConfiguration.getUtdTypeNameId(), applicationConfiguration.getUtdFunction(), applicationConfiguration.getUtdVersion(), 0,  XsdContentType.UserContractXsd);
         var output = new FileOutputStream(filename);
         output.write(content.getBytes());
         output.close();
     }
 
     public byte[] generateUniversalTransferDocumentTitle(byte [] document) throws DiadocSdkException {
-        var generatedTitle = api.getGenerateClient().generateTitleXml(myOrganizationBoxId,
+        var generatedTitle = getApi().getGenerateClient().generateTitleXml(myOrganizationBoxId,
                 applicationConfiguration.getUtdTypeNameId(),
                 applicationConfiguration.getUtdFunction(),
                 applicationConfiguration.getUtdVersion(),
@@ -135,7 +135,7 @@ public class DiadocService {
     }
 
     public DocumentProtos.Document getDocument(String messageId) throws DiadocSdkException {
-        var documentList = api.getDocumentClient().getDocumentsByMessageId(getMyBoxId(), messageId);
+        var documentList = getApi().getDocumentClient().getDocumentsByMessageId(getMyBoxId(), messageId);
         return documentList.getDocumentsList().stream()
                 .filter(document -> document.getDocumentType().equals(DocumentTypeProtos.DocumentType.UniversalTransferDocument))
                 .findFirst()
