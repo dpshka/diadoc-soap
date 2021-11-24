@@ -20,8 +20,6 @@ import java.util.List;
 @Service
 @Slf4j
 public class DiadocService {
-    //private final static String TEST_ORGANIZATION_INN = "9637612488";
-
     private final ApplicationConfiguration applicationConfiguration;
 
     private final DiadocApi api;
@@ -31,8 +29,6 @@ public class DiadocService {
 
     private final OrganizationProtos.Organization myOrganization;
     private final String myOrganizationBoxId;
-    //private final OrganizationProtos.Organization testOrganization;
-    //private final String testOrganizationBoxId;
 
     public DiadocService(ApplicationConfiguration applicationConfiguration) throws DiadocSdkException {
         this.applicationConfiguration = applicationConfiguration;
@@ -42,8 +38,6 @@ public class DiadocService {
 
         myOrganization = getOrganization(applicationConfiguration.getOrganizationInn());
         myOrganizationBoxId = getBoxId(myOrganization);
-        //testOrganization = getOrganization(TEST_ORGANIZATION_INN);
-        //testOrganizationBoxId = getBoxId(testOrganization);
     }
 
     private void authenticate() throws DiadocSdkException {
@@ -106,14 +100,6 @@ public class DiadocService {
     public String getMyBoxId() {
         return myOrganizationBoxId;
     }
-
-//    public OrganizationProtos.Organization getTestOrganization() {
-//        return testOrganization;
-//    }
-//
-//    public String getTestBoxId() {
-//        return testOrganizationBoxId;
-//    }
 
     private void saveUserContractXsd(String filename) throws Exception {
         var content = getApi().getDocumentTypeClient().getContent(applicationConfiguration.getUtdTypeNameId(), applicationConfiguration.getUtdFunction(), applicationConfiguration.getUtdVersion(), 0,  XsdContentType.UserContractXsd);

@@ -21,4 +21,5 @@ public class ApplicationConfiguration {
     private String signerFirstName;
     private String signerMiddleName;
     private String signerLastName;
+    private String signerTitle;
 }

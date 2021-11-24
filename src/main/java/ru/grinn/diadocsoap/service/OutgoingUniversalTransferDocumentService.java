@@ -117,6 +117,7 @@ public class OutgoingUniversalTransferDocumentService {
         diadocSignerDetails.setFirstName(applicationConfiguration.getSignerFirstName());
         diadocSignerDetails.setMiddleName(applicationConfiguration.getSignerMiddleName());
         diadocSignerDetails.setLastName(applicationConfiguration.getSignerLastName());
+        diadocSignerDetails.setPosition(applicationConfiguration.getSignerTitle());
         diadocSignerDetails.setSignerPowers(BigInteger.valueOf(ExtendedSignerProtos.SignerPowers.ResponsibleForOperationAndSignerForInvoice_VALUE));
         diadocSignerDetails.setSignerStatus(BigInteger.valueOf(ExtendedSignerProtos.SignerStatus.SellerEmployee_VALUE));
         diadocSignerDetails.setSignerType(String.valueOf(ExtendedSignerProtos.SignerType.LegalEntity_VALUE));

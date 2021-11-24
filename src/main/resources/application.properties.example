@@ -11,3 +11,4 @@ diadoc-soap.utdVersion=utd820_05_01_02_hyphen
 diadoc-soap.signerFirstName=<<first name>>
 diadoc-soap.signerMiddleName=<<middle name>>
 diadoc-soap.signerLastName=<<last name>>
+diadoc-soap.signerTitle=<<title>>
