@@ -49,7 +49,8 @@ public class OutgoingUniversalTransferDocumentService {
         String departmentId = diadocService.getMyDepartmentId(document.getShipper().getKpp());
         if (departmentId != null)
             messageToPostBuilder.setFromDepartmentId(departmentId);
-        var toBoxId = diadocService.getBoxId(diadocService.getOrganization(document.getBuyer().getInn()));
+        //var toBoxId = diadocService.getBoxId(diadocService.getOrganization(document.getBuyer().getInn()));
+        var toBoxId = diadocService.getTestBoxId(); // test
         messageToPostBuilder.setToBoxId(toBoxId);
 
         var postMessageResponse = diadocService.getApi().getMessageClient().postMessage(messageToPostBuilder.build());
@@ -94,7 +95,7 @@ public class OutgoingUniversalTransferDocumentService {
         userdataDocument.setDocumentShipments(diadocDocumentShipments);
 
         var diadocSigners = new UniversalTransferDocumentWithHyphens.Signers();
-        diadocSigners.getSignerReferenceOrSignerDetails().add(getDoadocSignerDetails(document));
+        diadocSigners.getSignerReferenceOrSignerDetails().add(getDiadocSignerDetails(document));
         userdataDocument.setSigners(diadocSigners);
 
         var diadocInvoiceTable = new InvoiceTable();
@@ -104,14 +105,12 @@ public class OutgoingUniversalTransferDocumentService {
         document.getItems().forEach(item -> diadocInvoiceTable.getItem().add(getDiadocInvoiceTableItem(item)));
         userdataDocument.setTable(diadocInvoiceTable);
 
-        var diadocTransferInfo = new TransferInfo();
-        diadocTransferInfo.setOperationInfo("Товары переданы");
-        userdataDocument.setTransferInfo(diadocTransferInfo);
+        userdataDocument.setTransferInfo(getTransferInfo(document));
 
         return userdataDocument;
     }
 
-    private ExtendedSignerDetailsSellerTitle getDoadocSignerDetails(UniversalTransferDocument document) {
+    private ExtendedSignerDetailsSellerTitle getDiadocSignerDetails(UniversalTransferDocument document) {
         var diadocSignerDetails = new ExtendedSignerDetailsSellerTitle();
         diadocSignerDetails.setInn(document.getSeller().getInn());
         diadocSignerDetails.setFirstName(applicationConfiguration.getSignerFirstName());
@@ -168,6 +167,18 @@ public class OutgoingUniversalTransferDocumentService {
         var diadocAddress = new Address();
         diadocAddress.setRussianAddress(diadocRussianAddress);
         return diadocAddress;
+    }
+
+    private TransferInfo getTransferInfo(UniversalTransferDocument document) {
+        var employee = new Employee();
+        employee.setFirstName(document.getTransferEmployee().getFirstName());
+        employee.setMiddleName(document.getTransferEmployee().getMiddleName());
+        employee.setLastName(document.getTransferEmployee().getLastName());
+        employee.setPosition(document.getTransferEmployee().getPosition());
+        var diadocTransferInfo = new TransferInfo();
+        diadocTransferInfo.setOperationInfo("Товары переданы");
+        diadocTransferInfo.setEmployee(employee);
+        return diadocTransferInfo;
     }
 
 }

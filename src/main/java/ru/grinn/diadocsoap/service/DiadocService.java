@@ -25,10 +25,14 @@ public class DiadocService {
     private final DiadocApi api;
 
     private Date lastAuthDate;
-    private static final long AUTH_PERIOD_IN_MILLIS = 1000 * 60 * 60 * 6;
+    private static final long AUTH_PERIOD_IN_MILLIS = 1000 * 60 * 60 * 6; // Six hours
 
     private final OrganizationProtos.Organization myOrganization;
     private final String myOrganizationBoxId;
+
+    private final static String TEST_ORGANIZATION_INN = "9637612488";
+    private final OrganizationProtos.Organization testOrganization;
+    private final String testOrganizationBoxId;
 
     public DiadocService(ApplicationConfiguration applicationConfiguration) throws DiadocSdkException {
         this.applicationConfiguration = applicationConfiguration;
@@ -38,6 +42,9 @@ public class DiadocService {
 
         myOrganization = getOrganization(applicationConfiguration.getOrganizationInn());
         myOrganizationBoxId = getBoxId(myOrganization);
+
+        testOrganization = getOrganization(TEST_ORGANIZATION_INN);
+        testOrganizationBoxId = getBoxId(testOrganization);
     }
 
     private void authenticate() throws DiadocSdkException {
@@ -79,6 +86,14 @@ public class DiadocService {
 
     public OrganizationProtos.Organization getMyOrganization() {
         return myOrganization;
+    }
+
+    public OrganizationProtos.Organization getTestOrganization() {
+        return testOrganization;
+    }
+
+    public String getTestBoxId() {
+        return testOrganizationBoxId;
     }
 
     public String getMyDepartmentId(String kpp) {

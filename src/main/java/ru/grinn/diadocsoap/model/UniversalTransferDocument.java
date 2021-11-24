@@ -22,6 +22,7 @@ public class UniversalTransferDocument {
     private BigDecimal totalAmount;
     private BigDecimal totalWithoutVatAmount;
     private String signatureStatus;
+    private TransferEmployee transferEmployee;
 
     private List<UniversalTransferDocumentItem> items;
 

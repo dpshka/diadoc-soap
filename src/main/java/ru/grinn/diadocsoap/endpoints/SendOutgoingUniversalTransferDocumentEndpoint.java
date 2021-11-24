@@ -1,7 +1,6 @@
 package ru.grinn.diadocsoap.endpoints;
 
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ws.server.endpoint.annotation.Endpoint;
 import org.springframework.ws.server.endpoint.annotation.PayloadRoot;
 import org.springframework.ws.server.endpoint.annotation.RequestPayload;
@@ -48,6 +47,7 @@ public class SendOutgoingUniversalTransferDocumentEndpoint {
         document.setShipper(getFirm(requestDocument.getShipper()));
         document.setBuyer(getFirm(requestDocument.getBuyer()));
         document.setConsignee(getFirm(requestDocument.getConsignee()));
+        document.setTransferEmployee(getTransferEmployee(requestDocument.getTransferEmployee()));
         document.setVatAmount(requestDocument.getVatAmount());
         document.setTotalAmount(requestDocument.getTotalAmount());
         document.setTotalWithoutVatAmount(requestDocument.getTotalWithoutVatAmount());
@@ -100,6 +100,15 @@ public class SendOutgoingUniversalTransferDocumentEndpoint {
         firm.setName(requestFirm.getName());
         firm.setAddress(getAddress(requestFirm.getAddress()));
         return firm;
+    }
+
+    private TransferEmployee getTransferEmployee(OutgoingUniversalTransferDocumentEmployee requestEmployee) {
+        TransferEmployee transferEmployee = new TransferEmployee();
+        transferEmployee.setFirstName(requestEmployee.getFirstName());
+        transferEmployee.setMiddleName(requestEmployee.getMiddleName());
+        transferEmployee.setLastName(requestEmployee.getLastName());
+        transferEmployee.setPosition(requestEmployee.getPosition());
+        return transferEmployee;
     }
 
 }
