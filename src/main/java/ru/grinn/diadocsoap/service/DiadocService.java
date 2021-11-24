@@ -76,6 +76,10 @@ public class DiadocService {
         return getApi().getOrganizationClient().getOrganizationByInn(inn);
     }
 
+    public OrganizationProtos.Organization getOrganizationByFnsParticipantId(String fnsParticipantId) throws DiadocSdkException {
+        return getApi().getOrganizationClient().getOrganizationByFnsParticipantId(fnsParticipantId);
+    }
+
     public String getBoxId(OrganizationProtos.Organization organization) throws DiadocSdkException {
         List<OrganizationProtos.Box> boxes = organization.getBoxesList();
         if (boxes.size() > 1) {

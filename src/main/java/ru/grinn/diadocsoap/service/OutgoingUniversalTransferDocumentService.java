@@ -49,8 +49,14 @@ public class OutgoingUniversalTransferDocumentService {
         String departmentId = diadocService.getMyDepartmentId(document.getShipper().getKpp());
         if (departmentId != null)
             messageToPostBuilder.setFromDepartmentId(departmentId);
-        //var toBoxId = diadocService.getBoxId(diadocService.getOrganization(document.getBuyer().getInn()));
-        var toBoxId = diadocService.getTestBoxId(); // test
+
+        var organizationBuyer =
+                document.getBuyer().getFnsPartipantId().length() > 0
+                        ? diadocService.getOrganizationByFnsParticipantId(document.getBuyer().getFnsPartipantId())
+                        : diadocService.getOrganization(document.getBuyer().getInn());
+        var toBoxId = diadocService.getBoxId(organizationBuyer);
+
+        // toBoxId = diadocService.getTestBoxId(); // test
         messageToPostBuilder.setToBoxId(toBoxId);
 
         var postMessageResponse = diadocService.getApi().getMessageClient().postMessage(messageToPostBuilder.build());

@@ -42,6 +42,7 @@
       <xs:element name="KPP" type="xs:string"/>
       <xs:element name="Name" type="xs:string"/>
       <xs:element name="Address" type="edo:OutgoingUniversalTransferDocumentFirmAddress"/>
+      <xs:element name="FnsParticipantId" type="xs:string"/>
     </xs:sequence>
   </xs:complexType>
 

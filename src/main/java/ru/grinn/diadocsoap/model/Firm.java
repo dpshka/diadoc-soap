@@ -8,4 +8,5 @@ public class Firm {
     private String kpp;
     private String name;
     private FirmAddress address;
+    private String fnsPartipantId;
 }

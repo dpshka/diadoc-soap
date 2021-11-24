@@ -99,6 +99,7 @@ public class SendOutgoingUniversalTransferDocumentEndpoint {
         firm.setKpp(requestFirm.getKPP());
         firm.setName(requestFirm.getName());
         firm.setAddress(getAddress(requestFirm.getAddress()));
+        firm.setFnsPartipantId(requestFirm.getFnsParticipantId());
         return firm;
     }
 
