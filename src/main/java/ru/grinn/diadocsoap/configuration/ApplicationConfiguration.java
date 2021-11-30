@@ -22,4 +22,5 @@ public class ApplicationConfiguration {
     private String signerMiddleName;
     private String signerLastName;
     private String signerTitle;
+    private String incomingStartDate;
 }

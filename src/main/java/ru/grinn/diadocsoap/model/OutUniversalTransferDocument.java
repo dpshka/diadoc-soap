@@ -8,7 +8,7 @@ import java.util.Date;
 import java.util.List;
 
 @Data
-public class UniversalTransferDocument {
+public class OutUniversalTransferDocument {
 
     private String documentNumber;
     private Date documentDate;
@@ -24,13 +24,13 @@ public class UniversalTransferDocument {
     private String signatureStatus;
     private TransferEmployee transferEmployee;
 
-    private List<UniversalTransferDocumentItem> items;
+    private List<OutUniversalTransferDocumentItem> items;
 
-    public UniversalTransferDocument() {
+    public OutUniversalTransferDocument() {
         items = new ArrayList<>();
     }
 
-    public void addItem(UniversalTransferDocumentItem item) {
+    public void addItem(OutUniversalTransferDocumentItem item) {
         items.add(item);
     }
 
