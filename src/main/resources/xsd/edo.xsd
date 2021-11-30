@@ -121,6 +121,70 @@
     </xs:complexType>
   </xs:element>
 
+  <xs:element name="GetIncomingUniversalTransferDocumentsRequest">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="AfterIndexKey" type="xs:string"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:complexType name="IncomingUniversalTransferDocumentFirmAddress">
+    <xs:sequence>
+      <xs:element name="ZipCode" type="xs:string"/>
+      <xs:element name="Region" type="xs:string"/>
+      <xs:element name="Territory" type="xs:string"/>
+      <xs:element name="City" type="xs:string"/>
+      <xs:element name="Locality" type="xs:string"/>
+      <xs:element name="Street" type="xs:string"/>
+      <xs:element name="Building" type="xs:string"/>
+      <xs:element name="Block" type="xs:string"/>
+      <xs:element name="Apartment" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="IncomingUniversalTransferDocumentFirm">
+    <xs:sequence>
+      <xs:element name="INN" type="xs:string"/>
+      <xs:element name="KPP" type="xs:string"/>
+      <xs:element name="Name" type="xs:string"/>
+      <xs:element name="Address" type="edo:IncomingUniversalTransferDocumentFirmAddress"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="IncomingUniversalTransferDocument">
+    <xs:sequence>
+      <xs:element name="DocumentNumber" type="xs:string"/>
+      <xs:element name="DocumentDate" type="xs:date"/>
+      <xs:element name="Seller" type="edo:IncomingUniversalTransferDocumentFirm"/>
+      <xs:element name="Shipper" type="edo:IncomingUniversalTransferDocumentFirm"/>
+      <xs:element name="Buyer" type="edo:IncomingUniversalTransferDocumentFirm"/>
+      <xs:element name="Consignee" type="edo:IncomingUniversalTransferDocumentFirm"/>
+      <xs:element name="VatAmount" type="xs:decimal"/>
+      <xs:element name="TotalAmount" type="xs:decimal"/>
+      <xs:element name="ActNumber" type="xs:integer"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="IncomingUniversalTransferDocuments">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="IncomingDocument" type="edo:IncomingUniversalTransferDocument"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:element name="GetIncomingUniversalTransferDocumentsResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="StatusCode" type="xs:string"/>
+        <xs:element name="StatusMessage" type="xs:string"/>
+        <xs:element name="LastIndexKey" type="xs:string"/>
+        <xs:element name="HasMoreResults" type="xs:boolean"/>
+        <xs:element minOccurs="1" name="IncomingDocuments" type="edo:IncomingUniversalTransferDocuments"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+
 </xs:schema>
 
 

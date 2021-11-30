@@ -5,7 +5,7 @@ import lombok.Data;
 import java.math.BigDecimal;
 
 @Data
-public class UniversalTransferDocumentItem {
+public class OutUniversalTransferDocumentItem {
     private String id;
     private String name;
     private String measureUnit;

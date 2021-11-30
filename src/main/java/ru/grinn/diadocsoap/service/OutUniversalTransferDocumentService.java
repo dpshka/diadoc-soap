@@ -18,12 +18,12 @@ import java.text.SimpleDateFormat;
 @Service
 @Slf4j
 @AllArgsConstructor
-public class OutgoingUniversalTransferDocumentService {
+public class OutUniversalTransferDocumentService {
     private final DiadocService diadocService;
     private final CertificateService certificateService;
     private final ApplicationConfiguration applicationConfiguration;
 
-    public String sendDocument(UniversalTransferDocument document) throws Exception {
+    public String sendDocument(OutUniversalTransferDocument document) throws Exception {
         UniversalTransferDocumentWithHyphens diadocDocument = getUserDataDocument(document);
 
         var marshaller = JAXBContext.newInstance(UniversalTransferDocumentWithHyphens.class).createMarshaller();
@@ -63,7 +63,7 @@ public class OutgoingUniversalTransferDocumentService {
         return postMessageResponse.getMessageId();
     }
 
-    private UniversalTransferDocumentWithHyphens getUserDataDocument(UniversalTransferDocument document) {
+    private UniversalTransferDocumentWithHyphens getUserDataDocument(OutUniversalTransferDocument document) {
         var userdataDocument  = new UniversalTransferDocumentWithHyphens();
 
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
@@ -116,7 +116,7 @@ public class OutgoingUniversalTransferDocumentService {
         return userdataDocument;
     }
 
-    private ExtendedSignerDetailsSellerTitle getDiadocSignerDetails(UniversalTransferDocument document) {
+    private ExtendedSignerDetailsSellerTitle getDiadocSignerDetails(OutUniversalTransferDocument document) {
         var diadocSignerDetails = new ExtendedSignerDetailsSellerTitle();
         diadocSignerDetails.setInn(document.getSeller().getInn());
         diadocSignerDetails.setFirstName(applicationConfiguration.getSignerFirstName());
@@ -129,7 +129,7 @@ public class OutgoingUniversalTransferDocumentService {
         return diadocSignerDetails;
     }
 
-    private InvoiceTable.Item getDiadocInvoiceTableItem(UniversalTransferDocumentItem item) {
+    private InvoiceTable.Item getDiadocInvoiceTableItem(OutUniversalTransferDocumentItem item) {
         var diadocInvoiceTableItem = new InvoiceTable.Item();
         diadocInvoiceTableItem.setItemVendorCode(item.getId());
         diadocInvoiceTableItem.setProduct(item.getName());
@@ -175,7 +175,7 @@ public class OutgoingUniversalTransferDocumentService {
         return diadocAddress;
     }
 
-    private TransferInfo getTransferInfo(UniversalTransferDocument document) {
+    private TransferInfo getTransferInfo(OutUniversalTransferDocument document) {
         var employee = new Employee();
         employee.setFirstName(document.getTransferEmployee().getFirstName());
         employee.setMiddleName(document.getTransferEmployee().getMiddleName());
