@@ -15,6 +15,7 @@ import ru.grinn.diadocsoap.xjs.*;
 import javax.xml.bind.JAXBContext;
 import java.io.ByteArrayOutputStream;
 import java.math.BigInteger;
+import java.util.Date;
 
 @Service
 @Slf4j
@@ -24,8 +25,8 @@ public class InUniversalTransferDocumentSignerService {
     private final CertificateService certificateService;
     private final ApplicationConfiguration applicationConfiguration;
 
-    public InUniversalTransferDocumentSignStatus signUniversalTransferDocument(String messageId, String entityId) throws Exception {
-        UniversalTransferDocumentBuyerTitle diadocBuyerTitle = getUniversalTransferDocumentBuyerTitle();
+    public InUniversalTransferDocumentSignStatus signUniversalTransferDocument(String messageId, String entityId, Date acceptanceDate) throws Exception {
+        UniversalTransferDocumentBuyerTitle diadocBuyerTitle = getUniversalTransferDocumentBuyerTitle(acceptanceDate);
         var marshaller = JAXBContext.newInstance(UniversalTransferDocumentBuyerTitle.class).createMarshaller();
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
         marshaller.marshal(diadocBuyerTitle, stream);
@@ -90,11 +91,13 @@ public class InUniversalTransferDocumentSignerService {
         return new InUniversalTransferDocumentSignStatus("OK", "Успешно отказан");
     }
 
-    private UniversalTransferDocumentBuyerTitle getUniversalTransferDocumentBuyerTitle() {
+    private UniversalTransferDocumentBuyerTitle getUniversalTransferDocumentBuyerTitle(Date acceptanceDate) {
         var diadocDocument = new UniversalTransferDocumentBuyerTitle();
 
         diadocDocument.setDocumentCreator(diadocService.getMyOrganization().getFullName());
         diadocDocument.setOperationContent("Товары и услуги получены, работы приняты");
+        diadocDocument.setEmployee(getEmployee());
+        diadocDocument.setAcceptanceDate(diadocService.dateToString(acceptanceDate));
 
         var diadocSigners = new UniversalTransferDocumentBuyerTitle.Signers();
         diadocSigners.getSignerReferenceOrSignerDetails().add(getUniversalTransferDocumentSignerDetails());
@@ -153,6 +156,16 @@ public class InUniversalTransferDocumentSignerService {
         signerDetails.setSignerType("1");
         signerDetails.setSignerPowersBase("Устав");
         return signerDetails;
+    }
+
+    private Employee getEmployee() {
+        var employee = new Employee();
+        employee.setFirstName(applicationConfiguration.getSignerFirstName());
+        employee.setMiddleName(applicationConfiguration.getSignerMiddleName());
+        employee.setLastName(applicationConfiguration.getSignerLastName());
+        employee.setPosition(applicationConfiguration.getSignerTitle());
+        employee.setEmployeeBase("Устав");
+        return employee;
     }
 
 }

@@ -16,6 +16,8 @@ import org.springframework.stereotype.Service;
 import ru.grinn.diadocsoap.configuration.ApplicationConfiguration;
 
 import java.io.FileOutputStream;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
@@ -37,6 +39,8 @@ public class DiadocService {
     private final OrganizationProtos.Organization testOrganization;
     private final String testOrganizationBoxId;
 
+    private final SimpleDateFormat dateFormat;
+
     public DiadocService(ApplicationConfiguration applicationConfiguration, CertificateService certificateService) throws DiadocSdkException {
         this.applicationConfiguration = applicationConfiguration;
         this.certificateService = certificateService;
@@ -49,6 +53,8 @@ public class DiadocService {
 
         testOrganization = getOrganization(TEST_ORGANIZATION_INN);
         testOrganizationBoxId = getBoxId(testOrganization);
+
+        dateFormat = new SimpleDateFormat("dd.MM.yyyy");
 
         //saveDocumentTypes( "d:/temp/types.dat");
         saveUserContractXsd("UniversalCorrectionDocument", "КСЧФДИС", "ucd736_05_01_02", 1, "d:/temp/UserContract_UCD_BuyerTitle.xsd");
@@ -209,6 +215,19 @@ public class DiadocService {
         signedContentBuilder.setContent(ByteString.copyFrom(document));
         signedContentBuilder.setSignature(ByteString.copyFrom(signature));
         return signedContentBuilder.build();
+    }
+
+    public String dateToString(Date date) {
+        return dateFormat.format(date);
+    }
+
+    public Date stringToDate(String s) {
+        try {
+            return dateFormat.parse(s);
+        }
+        catch (ParseException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 }

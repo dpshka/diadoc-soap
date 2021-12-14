@@ -11,7 +11,6 @@ import ru.grinn.diadocsoap.xjs.*;
 import javax.xml.bind.JAXBContext;
 import java.io.ByteArrayOutputStream;
 import java.math.BigInteger;
-import java.text.SimpleDateFormat;
 
 @Service
 @Slf4j
@@ -58,10 +57,8 @@ public class OutUniversalTransferDocumentService {
     private UniversalTransferDocumentWithHyphens getUserDataDocument(OutUniversalTransferDocument document) {
         var userdataDocument  = new UniversalTransferDocumentWithHyphens();
 
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
-
         userdataDocument.setDocumentNumber(document.getDocumentNumber());
-        userdataDocument.setDocumentDate(dateFormat.format(document.getDocumentDate()));
+        userdataDocument.setDocumentDate(diadocService.dateToString(document.getDocumentDate()));
         userdataDocument.setCurrency("643");
         userdataDocument.setFunction(applicationConfiguration.getUtdFunction());
         userdataDocument.setDocumentCreator(document.getSeller().getName());
@@ -87,7 +84,7 @@ public class OutUniversalTransferDocumentService {
         var diadocDocumentShipment = new UniversalTransferDocumentWithHyphens.DocumentShipments.DocumentShipment();
         diadocDocumentShipment.setName("УПД");
         diadocDocumentShipment.setNumber(document.getShipmentDocumentNumber());
-        diadocDocumentShipment.setDate(dateFormat.format(document.getShipmentDocumentDate()));
+        diadocDocumentShipment.setDate(diadocService.dateToString(document.getShipmentDocumentDate()));
         var diadocDocumentShipments = new UniversalTransferDocumentWithHyphens.DocumentShipments();
         diadocDocumentShipments.getDocumentShipment().add(diadocDocumentShipment);
         userdataDocument.setDocumentShipments(diadocDocumentShipments);

@@ -24,7 +24,7 @@ public class SignInUniversalTransferDocumentEndpoint {
         var response = new SignIncomingUniversalTransferDocumentResponse();
         try {
             if (request.getSign().intValue() == 1) {
-                var documentSignStatus = incomingUniversalTransferDocumentSignerService.signUniversalTransferDocument(request.getMessageId(), request.getEntityId());
+                var documentSignStatus = incomingUniversalTransferDocumentSignerService.signUniversalTransferDocument(request.getMessageId(), request.getEntityId(), request.getAcceptanceDate().toGregorianCalendar().getTime());
                 response.setStatusCode(documentSignStatus.getStatus());
                 response.setStatusMessage(documentSignStatus.getMessage());
             }

@@ -17,7 +17,6 @@ import javax.xml.bind.JAXBContext;
 import java.io.ByteArrayInputStream;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -36,8 +35,7 @@ public class InUniversalTransferDocumentLoaderService {
         documentsFilter.setFilterCategory("Any.InboundWaitingForRecipientSignature");
         if (afterIndexKey != null && afterIndexKey.length() > 0)
             documentsFilter.setAfterIndexKey(afterIndexKey);
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
-        documentsFilter.setFromDocumentDate(dateFormat.format(startDate));
+        documentsFilter.setFromDocumentDate(diadocService.dateToString(startDate));
 
         var documents = diadocService
                 .getApi()
@@ -52,10 +50,9 @@ public class InUniversalTransferDocumentLoaderService {
                 .map(this::getInUniversalTransferDocument)
                 .filter(Objects::nonNull)
                 .forEach(resultDocuments::add);
-
         return new InUniversalTransferDocumentStatus(
                 documents.getDocumentsList().size() > 0 ? documents.getDocumentsList().get(documents.getDocumentsList().size() - 1).getIndexKey() : "",
-                documents.getHasMoreResults(),
+                documents.getDocumentsList().size() > 0,
                 resultDocuments
         );
     }
@@ -82,8 +79,7 @@ public class InUniversalTransferDocumentLoaderService {
             resultDocument.setDocumentVersion(document.getVersion());
             resultDocument.setDocumentFunction(document.getFunction());
 
-            SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
-            resultDocument.setOriginalDocumentDate(dateFormat.parse("01.01.1980"));
+            resultDocument.setOriginalDocumentDate(diadocService.stringToDate("01.01.1980"));
 
             if (document.getDocumentType().equals(DocumentTypeProtos.DocumentType.UniversalTransferDocument) && document.getVersion().endsWith("hyphen")) {
                 fillUniversalTransferDocumentUTD(resultDocument, parsedContent);
@@ -109,8 +105,7 @@ public class InUniversalTransferDocumentLoaderService {
         UniversalTransferDocumentWithHyphens diadocDocument = (UniversalTransferDocumentWithHyphens) unmarshaller.unmarshal(inputStream);
 
         resultDocument.setDocumentNumber(diadocDocument.getDocumentNumber().trim());
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
-        resultDocument.setDocumentDate(dateFormat.parse(diadocDocument.getDocumentDate()));
+        resultDocument.setDocumentDate(diadocService.stringToDate(diadocDocument.getDocumentDate()));
 
         resultDocument.setBuyer(diadocDocument.getBuyers() != null ? getFirm(diadocDocument.getBuyers().getBuyer().get(0).getOrganizationDetails()) : null);
         resultDocument.setShipper(diadocDocument.getShippers() != null ? getFirm(diadocDocument.getShippers().getShipper().get(0).getOrganizationDetails()) : null);
@@ -131,8 +126,7 @@ public class InUniversalTransferDocumentLoaderService {
         UniversalCorrectionDocument diadocDocument = (UniversalCorrectionDocument) unmarshaller.unmarshal(inputStream);
 
         resultDocument.setDocumentNumber(diadocDocument.getDocumentNumber());
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
-        resultDocument.setDocumentDate(dateFormat.parse(diadocDocument.getDocumentDate()));
+        resultDocument.setDocumentDate(diadocService.stringToDate(diadocDocument.getDocumentDate()));
 
         resultDocument.setBuyer(getForeignFirm(diadocDocument.getBuyer().getOrganizationDetails()));
         resultDocument.setSeller(getForeignFirm(diadocDocument.getSeller().getOrganizationDetails()));
@@ -140,7 +134,7 @@ public class InUniversalTransferDocumentLoaderService {
         if (diadocDocument.getInvoices().getInvoice().size() > 0) {
             var invoice = diadocDocument.getInvoices().getInvoice().get(0);
             resultDocument.setOriginalDocumentNumber(invoice.getNumber().trim());
-            resultDocument.setOriginalDocumentDate(dateFormat.parse(invoice.getDate()));
+            resultDocument.setOriginalDocumentDate(diadocService.stringToDate(invoice.getDate()));
         }
         BigDecimal vat = BigDecimal.ZERO;
         BigDecimal total = BigDecimal.ZERO;

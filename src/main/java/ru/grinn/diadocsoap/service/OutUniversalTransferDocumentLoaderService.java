@@ -6,7 +6,6 @@ import org.springframework.stereotype.Service;
 import ru.grinn.diadocsoap.model.OutUniversalTransferDocument;
 
 import java.math.BigDecimal;
-import java.text.SimpleDateFormat;
 
 @Service
 @Slf4j
@@ -18,8 +17,7 @@ public class OutUniversalTransferDocumentLoaderService {
         var document = new OutUniversalTransferDocument();
         var diadocDocument = diadocService.getUTDDocument(messageId);
         document.setDocumentNumber(diadocDocument.getDocumentNumber());
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
-        document.setDocumentDate(dateFormat.parse(diadocDocument.getDocumentDate()));
+        document.setDocumentDate(diadocService.stringToDate(diadocDocument.getDocumentDate()));
         document.setVatAmount(new BigDecimal(diadocDocument.getUniversalTransferDocumentMetadata().getVat()));
         document.setTotalAmount(new BigDecimal(diadocDocument.getUniversalTransferDocumentMetadata().getTotal()));
         document.setSignatureStatus(diadocDocument.getRecipientResponseStatus().toString());

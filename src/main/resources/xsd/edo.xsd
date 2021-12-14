@@ -200,6 +200,7 @@
       <xs:sequence>
         <xs:element name="MessageId" type="xs:string"/>
         <xs:element name="EntityId" type="xs:string"/>
+        <xs:element name="AcceptanceDate" type="xs:date"/>
         <xs:element name="Sign" type="xs:integer"/>
       </xs:sequence>
     </xs:complexType>
