@@ -14,14 +14,10 @@ import java.security.cert.X509Certificate;
 @Service
 @Slf4j
 public class CertificateService {
-    private final ApplicationConfiguration applicationConfiguration;
-
     private final PrivateKey privateKey;
     private final X509Certificate x509Certificate;
 
     public CertificateService(ApplicationConfiguration applicationConfiguration) throws Exception {
-        this.applicationConfiguration = applicationConfiguration;
-
         Security.addProvider(new JCP());
 
         KeyStore keyStore = KeyStore.getInstance("HDImageStore");
@@ -34,6 +30,16 @@ public class CertificateService {
 
     public byte[] sign(byte[] bytes) throws Exception {
         return CertificateHelper.CMSSign(bytes, privateKey, x509Certificate, false);
+    }
+
+    public byte[] getRawCertificate() {
+        try {
+            return x509Certificate.getEncoded();
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
 }

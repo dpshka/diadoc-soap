@@ -18,9 +18,11 @@ public class ApplicationConfiguration {
     private String utdTypeNameId;
     private String utdFunction;
     private String utdVersion;
+    private String ucdTypeNameId;
+    private String ucdFunction;
+    private String ucdVersion;
     private String signerFirstName;
     private String signerMiddleName;
     private String signerLastName;
     private String signerTitle;
-    private String incomingStartDate;
 }

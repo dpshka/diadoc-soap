@@ -124,6 +124,7 @@
   <xs:element name="GetIncomingUniversalTransferDocumentsRequest">
     <xs:complexType>
       <xs:sequence>
+        <xs:element name="StartDate" type="xs:date"/>
         <xs:element name="AfterIndexKey" type="xs:string"/>
       </xs:sequence>
     </xs:complexType>
@@ -140,6 +141,7 @@
       <xs:element name="Building" type="xs:string"/>
       <xs:element name="Block" type="xs:string"/>
       <xs:element name="Apartment" type="xs:string"/>
+      <xs:element name="FullAddress" type="xs:string"/>
     </xs:sequence>
   </xs:complexType>
 
@@ -154,8 +156,17 @@
 
   <xs:complexType name="IncomingUniversalTransferDocument">
     <xs:sequence>
+      <xs:element name="MessageId" type="xs:string"/>
+      <xs:element name="EntityId" type="xs:string"/>
+      <xs:element name="RecipientResponseStatus" type="xs:string"/>
+      <xs:element name="DocflowStatus" type="xs:string"/>
+      <xs:element name="DocumentType" type="xs:string"/>
+      <xs:element name="DocumentVersion" type="xs:string"/>
+      <xs:element name="DocumentFunction" type="xs:string"/>
       <xs:element name="DocumentNumber" type="xs:string"/>
       <xs:element name="DocumentDate" type="xs:date"/>
+      <xs:element name="OriginalDocumentNumber" type="xs:string"/>
+      <xs:element name="OriginalDocumentDate" type="xs:date"/>
       <xs:element name="Seller" type="edo:IncomingUniversalTransferDocumentFirm"/>
       <xs:element name="Shipper" type="edo:IncomingUniversalTransferDocumentFirm"/>
       <xs:element name="Buyer" type="edo:IncomingUniversalTransferDocumentFirm"/>
@@ -184,6 +195,24 @@
     </xs:complexType>
   </xs:element>
 
+  <xs:element name="SignIncomingUniversalTransferDocumentRequest">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="MessageId" type="xs:string"/>
+        <xs:element name="EntityId" type="xs:string"/>
+        <xs:element name="Sign" type="xs:integer"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="SignIncomingUniversalTransferDocumentResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="StatusCode" type="xs:string"/>
+        <xs:element name="StatusMessage" type="xs:string"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
 
 </xs:schema>
 

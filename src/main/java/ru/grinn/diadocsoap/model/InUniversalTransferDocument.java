@@ -9,8 +9,17 @@ import java.util.Date;
 @Data
 public class InUniversalTransferDocument {
 
+    private String messageId;
+    private String entityId;
+    private String recipientResponseStatus;
+    private String docflowStatus;
+    private String documentType;
+    private String documentVersion;
+    private String documentFunction;
     private String documentNumber;
     private Date documentDate;
+    private String originalDocumentNumber;
+    private Date originalDocumentDate;
     private Firm seller;
     private Firm shipper;
     private Firm buyer;

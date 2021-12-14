@@ -13,4 +13,5 @@ public class FirmAddress {
     private String building;
     private String block;
     private String apartment;
+    private String fullAddress;
 }

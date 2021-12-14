@@ -29,7 +29,7 @@ public class GetInUniversalTransferDocumentsEndpoint {
     public GetIncomingUniversalTransferDocumentsResponse send(@RequestPayload GetIncomingUniversalTransferDocumentsRequest request) {
         var response = new GetIncomingUniversalTransferDocumentsResponse();
         try {
-            var documentStatus = incomingUniversalTransferDocumentLoaderService.getIncomingDocuments(request.getAfterIndexKey());
+            var documentStatus = incomingUniversalTransferDocumentLoaderService.getIncomingDocuments(request.getStartDate().toGregorianCalendar().getTime(), request.getAfterIndexKey());
             IncomingUniversalTransferDocuments responseDocuments = new IncomingUniversalTransferDocuments();
             documentStatus.getDocuments().forEach(document -> responseDocuments.getIncomingDocument().add(getDocument(document)));
             response.setIncomingDocuments(responseDocuments);
@@ -50,11 +50,25 @@ public class GetInUniversalTransferDocumentsEndpoint {
 
     private IncomingUniversalTransferDocument getDocument(InUniversalTransferDocument document) {
         var result = new IncomingUniversalTransferDocument();
+        result.setMessageId(document.getMessageId());
+        result.setEntityId(document.getEntityId());
+        result.setRecipientResponseStatus(document.getRecipientResponseStatus());
+        result.setDocflowStatus(document.getDocflowStatus());
+        result.setDocumentType(document.getDocumentType());
+        result.setDocumentVersion(document.getDocumentVersion());
+        result.setDocumentFunction(document.getDocumentFunction());
         result.setDocumentNumber(document.getDocumentNumber());
         GregorianCalendar gregorianCalendar = new GregorianCalendar();
         gregorianCalendar.setTime(document.getDocumentDate());
         try {
             result.setDocumentDate(DatatypeFactory.newInstance().newXMLGregorianCalendar(gregorianCalendar));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        result.setOriginalDocumentNumber(document.getOriginalDocumentNumber());
+        gregorianCalendar.setTime(document.getOriginalDocumentDate());
+        try {
+            result.setOriginalDocumentDate(DatatypeFactory.newInstance().newXMLGregorianCalendar(gregorianCalendar));
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -75,7 +89,7 @@ public class GetInUniversalTransferDocumentsEndpoint {
         if (firm != null) {
             result.setINN(firm.getInn());
             result.setKPP(firm.getKpp());
-            result.setName(firm.getName());
+            result.setName(replaceSpecialFirmName(firm.getName()));
             result.setAddress(getFirmAddress(firm.getAddress()));
         }
         return result;
@@ -93,8 +107,14 @@ public class GetInUniversalTransferDocumentsEndpoint {
             result.setBuilding(address.getBuilding());
             result.setBlock(address.getBlock());
             result.setApartment(address.getApartment());
+            result.setFullAddress(address.getFullAddress());
         }
         return result;
+    }
 
+    private String replaceSpecialFirmName(String firmName) {
+        firmName = firmName.replaceAll("[«»]", "\"");
+        firmName = firmName.replaceAll("№", "N");
+        return firmName;
     }
 }

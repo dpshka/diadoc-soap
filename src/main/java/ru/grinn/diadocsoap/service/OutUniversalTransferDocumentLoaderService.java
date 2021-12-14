@@ -16,7 +16,7 @@ public class OutUniversalTransferDocumentLoaderService {
 
     public OutUniversalTransferDocument getOutgoingDocument(String messageId) throws Exception {
         var document = new OutUniversalTransferDocument();
-        var diadocDocument = diadocService.getDocument(messageId);
+        var diadocDocument = diadocService.getUTDDocument(messageId);
         document.setDocumentNumber(diadocDocument.getDocumentNumber());
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
         document.setDocumentDate(dateFormat.parse(diadocDocument.getDocumentDate()));

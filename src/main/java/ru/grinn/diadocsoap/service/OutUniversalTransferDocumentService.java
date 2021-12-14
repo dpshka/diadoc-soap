@@ -1,8 +1,6 @@
 package ru.grinn.diadocsoap.service;
 
 import Diadoc.Api.Proto.Events.DiadocMessage_PostApiProtos;
-import Diadoc.Api.Proto.Invoicing.Signers.ExtendedSignerProtos;
-import com.google.protobuf.ByteString;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -20,7 +18,6 @@ import java.text.SimpleDateFormat;
 @AllArgsConstructor
 public class OutUniversalTransferDocumentService {
     private final DiadocService diadocService;
-    private final CertificateService certificateService;
     private final ApplicationConfiguration applicationConfiguration;
 
     public String sendDocument(OutUniversalTransferDocument document) throws Exception {
@@ -31,17 +28,12 @@ public class OutUniversalTransferDocumentService {
         marshaller.marshal(diadocDocument, stream);
 
         byte[] generatedDocument = diadocService.generateUniversalTransferDocumentTitle(stream.toByteArray());
-        byte[] signature = certificateService.sign(generatedDocument);
 
         var documentAttachmentBuilder = DiadocMessage_PostApiProtos.DocumentAttachment.newBuilder();
         documentAttachmentBuilder.setTypeNamedId(applicationConfiguration.getUtdTypeNameId());
         documentAttachmentBuilder.setFunction(applicationConfiguration.getUtdFunction());
         documentAttachmentBuilder.setVersion(applicationConfiguration.getUtdVersion());
-
-        var signedContentBuilder = DiadocMessage_PostApiProtos.SignedContent.newBuilder();
-        signedContentBuilder.setContent(ByteString.copyFrom(generatedDocument));
-        signedContentBuilder.setSignature(ByteString.copyFrom(signature));
-        documentAttachmentBuilder.setSignedContent(signedContentBuilder);
+        documentAttachmentBuilder.setSignedContent(diadocService.signMessage(generatedDocument));
 
         var messageToPostBuilder = DiadocMessage_PostApiProtos.MessageToPost.newBuilder();
         messageToPostBuilder.addDocumentAttachments(documentAttachmentBuilder);
@@ -123,9 +115,9 @@ public class OutUniversalTransferDocumentService {
         diadocSignerDetails.setMiddleName(applicationConfiguration.getSignerMiddleName());
         diadocSignerDetails.setLastName(applicationConfiguration.getSignerLastName());
         diadocSignerDetails.setPosition(applicationConfiguration.getSignerTitle());
-        diadocSignerDetails.setSignerPowers(BigInteger.valueOf(ExtendedSignerProtos.SignerPowers.ResponsibleForOperationAndSignerForInvoice_VALUE));
-        diadocSignerDetails.setSignerStatus(BigInteger.valueOf(ExtendedSignerProtos.SignerStatus.SellerEmployee_VALUE));
-        diadocSignerDetails.setSignerType(String.valueOf(ExtendedSignerProtos.SignerType.LegalEntity_VALUE));
+        diadocSignerDetails.setSignerPowers(BigInteger.valueOf(3));
+        diadocSignerDetails.setSignerStatus(BigInteger.valueOf(5));
+        diadocSignerDetails.setSignerType("1");
         return diadocSignerDetails;
     }
 
