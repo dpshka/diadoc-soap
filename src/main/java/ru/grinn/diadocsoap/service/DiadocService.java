@@ -57,7 +57,7 @@ public class DiadocService {
         dateFormat = new SimpleDateFormat("dd.MM.yyyy");
 
         //saveDocumentTypes( "d:/temp/types.dat");
-        saveUserContractXsd("UniversalCorrectionDocument", "КСЧФДИС", "ucd736_05_01_02", 1, "d:/temp/UserContract_UCD_BuyerTitle.xsd");
+        //saveUserContractXsd("UniversalCorrectionDocument", "КСЧФДИС", "ucd736_05_01_02", 1, "d:/temp/UserContract_UCD_BuyerTitle.xsd");
     }
 
     private void authenticate() throws DiadocSdkException {

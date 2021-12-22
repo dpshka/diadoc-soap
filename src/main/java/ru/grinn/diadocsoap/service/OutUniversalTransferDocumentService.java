@@ -113,7 +113,7 @@ public class OutUniversalTransferDocumentService {
         diadocSignerDetails.setLastName(applicationConfiguration.getSignerLastName());
         diadocSignerDetails.setPosition(applicationConfiguration.getSignerTitle());
         diadocSignerDetails.setSignerPowers(BigInteger.valueOf(3));
-        diadocSignerDetails.setSignerStatus(BigInteger.valueOf(5));
+        diadocSignerDetails.setSignerStatus(BigInteger.valueOf(1));
         diadocSignerDetails.setSignerType("1");
         return diadocSignerDetails;
     }
