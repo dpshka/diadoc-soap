@@ -93,7 +93,8 @@ public class InUniversalTransferDocumentLoaderService {
 
         }
         catch (Exception e) {
-            throw new RuntimeException(e);
+            log.error("getInUniversalTransferDocument exception {}", e.toString());
+            return null;
         }
         log.error("Unknown document type={} version={} function={}", document.getDocumentType().name(), document.getVersion(), document.getFunction());
         return null;
