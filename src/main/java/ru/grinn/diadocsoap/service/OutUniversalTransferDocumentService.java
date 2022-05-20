@@ -139,6 +139,8 @@ public class OutUniversalTransferDocumentService {
         diadocOrganisationDetails.setOrgName(firm.getName());
         diadocOrganisationDetails.setOrgType(firm.getKpp() != null && firm.getKpp().length() > 0 ? "1" : "2");
         diadocOrganisationDetails.setAddress(getDiadocAddress(firm.getAddress()));
+        if (firm.getFnsPartipantId() != null && firm.getFnsPartipantId().length() > 0)
+            diadocOrganisationDetails.setFnsParticipantId(firm.getFnsPartipantId());
         return diadocOrganisationDetails;
     }
 
