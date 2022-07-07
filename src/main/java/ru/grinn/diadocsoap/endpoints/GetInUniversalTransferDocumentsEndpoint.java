@@ -80,6 +80,17 @@ public class GetInUniversalTransferDocumentsEndpoint {
         result.setVatAmount(document.getVatAmount());
         result.setTotalAmount(document.getTotalAmount());
         result.setActNumber(document.getActNumber());
+        result.setContractNumber(document.getContractNumber());
+
+        if (document.getContractDate() != null) {
+            gregorianCalendar.setTime(document.getContractDate());
+            try {
+                result.setContractDate(DatatypeFactory.newInstance().newXMLGregorianCalendar(gregorianCalendar));
+            }
+            catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
 
         return result;
     }

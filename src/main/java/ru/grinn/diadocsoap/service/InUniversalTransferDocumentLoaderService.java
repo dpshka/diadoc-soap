@@ -119,6 +119,12 @@ public class InUniversalTransferDocumentLoaderService {
         if (diadocDocument.getAdditionalInfoId() != null) {
             resultDocument.setActNumber(getActNumber(diadocDocument.getAdditionalInfoId().getAdditionalInfo()));
         }
+        if (diadocDocument.getTransferInfo() != null && diadocDocument.getTransferInfo().getTransferBases().getTransferBase().size() > 0) {
+            var transferBase = diadocDocument.getTransferInfo().getTransferBases().getTransferBase().get(0);
+            resultDocument.setContractNumber(transferBase.getBaseDocumentNumber());
+            if (transferBase.getBaseDocumentDate() != null)
+                resultDocument.setContractDate(diadocService.stringToDate(transferBase.getBaseDocumentDate()));
+        }
     }
 
     private void fillUniversalTransferDocumentUCD(InUniversalTransferDocument resultDocument, byte[] parsedContent) throws Exception {

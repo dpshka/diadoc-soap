@@ -26,5 +26,7 @@ public class InUniversalTransferDocument {
     private Firm consignee;
     private BigDecimal vatAmount;
     private BigDecimal totalAmount;
-    private BigInteger ActNumber;
+    private BigInteger actNumber;
+    private String contractNumber;
+    private Date contractDate;
 }
